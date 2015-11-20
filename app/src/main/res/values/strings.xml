@@ -1,0 +1,15 @@
+<resources>
+
+    <string name="server_client_id">667727822449-63cdrcue58o3avmgrsi93hl0b2ubsopd.apps.googleusercontent.com</string>
+    <string name="facebook_app_id">992570394118328</string>
+
+    <string name="app_name">PracaLicencjacka_Prototyp2</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+
+
+    <!-- Button text -->
+    <string name="btn_logout_from_google">Logout from Google</string>
+    <string name="btn_revoke_access">Revoke Access</string>
+</resources>
