@@ -5,14 +5,26 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
+import com.facebook.FacebookSdk;
+
+import wmp.uksw.pl.pracalicencjacka_prototyp2.helpers.SessionManager;
+
 /**
  * Created by MSI on 2015-11-19.
  */
 public abstract class MyActivityTemplate extends AppCompatActivity {
 
+    protected SessionManager sessionManager;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Initialize Facebook SDK and set callbackManager
+        FacebookSdk.sdkInitialize(getContext());
+
+        //creates SessionManager object that helps with managing
+        sessionManager = new SessionManager(getContext());
 
         setContentView(getLayoutResourceId());
     }

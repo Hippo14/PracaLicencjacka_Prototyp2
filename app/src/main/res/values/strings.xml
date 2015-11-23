@@ -12,4 +12,10 @@
     <!-- Button text -->
     <string name="btn_logout_from_google">Logout from Google</string>
     <string name="btn_revoke_access">Revoke Access</string>
+    <string name="title_activity_menu">MenuActivity</string>
+    <string name="Name">Name</string>
+    <string name="Email">Email</string>
+    <string name="Password">Password</string>
+    <string name="emailRegister">Register</string>
+    <string name="EmailButton">Sign in with E-mail</string>
 </resources>

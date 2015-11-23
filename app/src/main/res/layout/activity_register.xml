@@ -24,71 +24,107 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentStart="true"
         android:layout_alignEnd="@+id/btnGooglePlusRegister"
-        android:layout_marginTop="10dp" />
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp" />
 
-    <TextView
-        android:layout_width="wrap_content"
+    <Button
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="Large Text"
-        android:id="@+id/test"
-        android:layout_above="@+id/btnGooglePlusRegister"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="70dp"
-        android:layout_gravity="center_horizontal" />
+        android:text="@string/EmailButton"
+        android:id="@+id/btnEmailRegister"
+        android:layout_gravity="center_horizontal"
+        android:background="#FFFFFF"
+        android:drawableLeft="@mipmap/ic_email_register"
+        android:paddingLeft="10dp"
+        android:drawablePadding="10dp"
+        android:layout_marginBottom="10dp" />
 
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_alignBottom="@+id/btnFacebookRegister"
-        android:layout_alignParentStart="true">
+        android:layout_alignParentStart="true"
+        android:visibility="invisible"
+        android:id="@+id/layoutRegister">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="Medium Text"
-            android:id="@+id/tvLogin"
+            android:text="@string/Name"
+            android:id="@+id/tvName"
             android:layout_alignParentTop="true"
-            android:layout_centerHorizontal="true" />
+            android:layout_centerHorizontal="true"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="5dp" />
 
         <EditText
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="textEmailAddress"
             android:ems="10"
-            android:id="@+id/editText"
-            android:layout_below="@+id/tvLogin"
+            android:id="@+id/etName"
+            android:layout_below="@+id/tvName"
             android:layout_alignParentEnd="true"
-            android:layout_alignParentStart="true" />
+            android:layout_alignParentStart="true"
+            android:layout_marginBottom="5dp" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="Medium Text"
-            android:id="@+id/tvPassword"
-            android:layout_below="@+id/editText"
-            android:layout_alignStart="@+id/tvLogin" />
+            android:text="@string/Email"
+            android:id="@+id/tvEmail"
+            android:layout_below="@+id/etName"
+            android:layout_alignStart="@+id/tvName"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="5dp" />
 
         <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:id="@+id/etEmail"
+            android:layout_below="@+id/tvEmail"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentStart="true"
+            android:inputType="textEmailAddress"
+            android:layout_marginBottom="5dp" />
+
+        <TextView
             android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="@string/Password"
+            android:id="@+id/tvPassword"
+            android:layout_below="@+id/etName"
+            android:layout_alignStart="@+id/tvName"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="5dp" />
+
+        <EditText
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="textPassword"
             android:ems="10"
-            android:id="@+id/editText2"
-            android:layout_below="@+id/tvPassword"
+            android:id="@+id/etPassword"
+            android:layout_below="@+id/tvEmail"
             android:layout_alignParentEnd="true"
-            android:layout_alignParentStart="true" />
+            android:layout_alignParentStart="true"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="5dp" />
 
         <Button
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="New Button"
-            android:id="@+id/btnEmailRegister"
-            android:layout_below="@+id/editText2"
-            android:layout_alignParentStart="true" />
+            android:text="@string/emailRegister"
+            android:id="@+id/btnEmailSignIn"
+            android:layout_gravity="center_horizontal"
+            android:background="#FFFFFF"
+            android:paddingLeft="10dp"
+            android:drawablePadding="10dp"
+            android:layout_marginTop="5dp" />
+
     </LinearLayout>
 
 </LinearLayout>
