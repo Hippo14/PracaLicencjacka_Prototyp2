@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Base64;
 import android.util.Log;
@@ -13,13 +12,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
-import com.facebook.FacebookSdk;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
 import com.facebook.Profile;
@@ -40,42 +39,39 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 
+import wmp.uksw.pl.pracalicencjacka_prototyp2.constants.accountTypes;
 import wmp.uksw.pl.pracalicencjacka_prototyp2.template.MyActivityTemplate;
+import wmp.uksw.pl.pracalicencjacka_prototyp2.user.EmailUser;
+import wmp.uksw.pl.pracalicencjacka_prototyp2.user.ProfileUser;
 
-public class RegisterActivity extends AppCompatActivity implements View.OnClickListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+public class RegisterActivity extends MyActivityTemplate implements View.OnClickListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     private static final int RC_SIGN_IN = 0;
 
-
-    /**
-     * A flag indicating that a PendingIntent is in progress and prevents us
-     * from starting further intents.
-     */
-    private boolean mIntentInProgress;
-    private boolean mSignInClicked;
-
-    private ConnectionResult mConnectionResult;
-
     private GoogleApiClient mGoogleApiClient;
-    private SignInButton signInButton;
+    private CallbackManager callbackManager;
 
     private Button btnEmailRegister;
     private SignInButton btnGooglePlusRegister;
     private LoginButton btnFacebookRegister;
 
-    private CallbackManager callbackManager;
+    // EMAIL  USER
+    private EmailUser emailUser;
 
-    private GoogleSignInAccount acct;
-    private JSONObject facebookUser;
+    // GOOGLE PLUS USER
+    private GoogleSignInAccount googleplusUser;
+
+    // FACEBOOK USER
+    private JSONObject facebookJSON;
+    private AccessToken facebookAccessToken;
+    private Profile facebookProfile;
+
+    // APPLICATION USER
+    private ProfileUser profileUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        // Initialize Facebook SDK and set callbackManager
-        FacebookSdk.sdkInitialize(getApplicationContext());
-
-        setContentView(R.layout.activity_register);
 
         callbackManager = CallbackManager.Factory.create();
 
@@ -101,20 +97,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         // Callback registration
         btnFacebookRegister.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
             @Override
-            public void onSuccess(LoginResult loginResult) {
-                // App code
-
-                Log.e("onSuccess", "--------" + loginResult.getAccessToken());
-                Log.e("Token", "--------" + loginResult.getAccessToken().getToken());
-                Log.e("Permision", "--------" + loginResult.getRecentlyGrantedPermissions());
-                Profile profile = Profile.getCurrentProfile();
-                Log.e("ProfileDataNameF", "--" + profile.getFirstName());
-                Log.e("ProfileDataNameL", "--" + profile.getLastName());
-
-                Log.e("Image URI", "--" + profile.getLinkUri());
-
-                Log.e("OnGraph", "------------------------");
-
+            public void onSuccess(final LoginResult loginResult) {
                 GraphRequest request = GraphRequest.newMeRequest(
                         loginResult.getAccessToken(),
                         new GraphRequest.GraphJSONObjectCallback() {
@@ -123,8 +106,19 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                                     JSONObject object,
                                     GraphResponse response) {
                                 // Application code
-                                Log.e("Response", response.toString());
-                                facebookUser = response.getJSONObject();
+                                facebookJSON = response.getJSONObject();
+                                facebookAccessToken = loginResult.getAccessToken();
+                                facebookProfile = Profile.getCurrentProfile();
+
+                                // TODO New activity
+                                profileUser = new ProfileUser(facebookJSON, facebookProfile, accountTypes.ACCOUNT_FACEBOOK);
+
+                                sessionManager.clearSession();
+                                sessionManager.setProfileUser(profileUser);
+
+                                Intent intent = new Intent(RegisterActivity.this, MenuActivity.class);
+                                startActivity(intent);
+                                finish();
                             }
                         });
                 Bundle parameters = new Bundle();
@@ -224,7 +218,10 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                 googlePlusSignIn();
                 break;
             case R.id.btnEmailRegister:
-                //emailSignIn();
+                emailRegister();
+                break;
+            case R.id.btnEmailSignIn:
+                emailSignIn();
                 break;
             case R.id.btnFacebookRegister:
                 facebookSignIn();
@@ -232,7 +229,30 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         }
     }
 
+    private void emailSignIn() {
+        TextView name = (TextView) findViewById(R.id.tvName);
+        TextView email = (TextView) findViewById(R.id.tvEmail);
+        TextView password = (TextView) findViewById(R.id.tvPassword);
+
+        // TODO New activity
+        ProfileUser profileUser = new ProfileUser(name, email, password, accountTypes.ACCOUNT_EMAIL);
+
+        sessionManager.clearSession();
+        sessionManager.setProfileUser(profileUser);
+    }
+
+    private void emailRegister() {
+        LinearLayout linearLayout = (LinearLayout) findViewById(R.id.layoutRegister);
+        if (linearLayout.getVisibility() == View.VISIBLE)
+            linearLayout.setVisibility(View.INVISIBLE);
+        else
+            linearLayout.setVisibility(View.VISIBLE);
+
+
+    }
+
     private void facebookSignIn() {
+
     }
 
     private void googlePlusSignIn() {
@@ -257,10 +277,17 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
     private void handleSignInResult(GoogleSignInResult result) {
         if (result.isSuccess()) {
             // Signed in successfully, show authenticated UI.
-            acct = result.getSignInAccount();
-            TextView test = (TextView) findViewById(R.id.test);
-            test.setText(acct.getDisplayName());
-            updateUI(true);
+            googleplusUser = result.getSignInAccount();
+
+            // TODO New activity
+            profileUser = new ProfileUser(googleplusUser, accountTypes.ACCOUNT_GOOGLEPLUS);
+
+            sessionManager.clearSession();
+            sessionManager.setProfileUser(profileUser);
+
+            Intent intent = new Intent(RegisterActivity.this, MenuActivity.class);
+            startActivity(intent);
+            finish();
         } else {
             // Signed out, show unauthenticated UI.
             updateUI(false);
@@ -291,8 +318,6 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
 
     @Override
     public void onConnected(Bundle arg0) {
-        Toast.makeText(this, "User is connected!", Toast.LENGTH_LONG).show();
-
         // Update the UI after signin
         updateUI(true);
     }
@@ -317,5 +342,15 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
 
+    }
+
+    @Override
+    protected int getLayoutResourceId() {
+        return R.layout.activity_register;
+    }
+
+    @Override
+    protected Context getContext() {
+        return getApplicationContext();
     }
 }
