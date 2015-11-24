@@ -44,12 +44,12 @@ public class MapsFragment extends SupportMapFragment {
 
     public void onPause() {
         super.onPause();
-        //Toast.makeText(getActivity(), "onPause();", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getActivity(), "onPause();", Toast.LENGTH_SHORT).show();
     }
 
     public void onResume() {
         super.onResume();
-        //Toast.makeText(getActivity(), "onResume();", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getActivity(), "onResume();", Toast.LENGTH_SHORT).show();
     }
 
     public void onDestroyView() {

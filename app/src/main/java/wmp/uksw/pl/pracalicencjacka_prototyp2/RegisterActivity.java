@@ -12,6 +12,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -52,6 +53,7 @@ public class RegisterActivity extends MyActivityTemplate implements View.OnClick
     private CallbackManager callbackManager;
 
     private Button btnEmailRegister;
+    private Button btnEmailSignIn;
     private SignInButton btnGooglePlusRegister;
     private LoginButton btnFacebookRegister;
 
@@ -77,11 +79,13 @@ public class RegisterActivity extends MyActivityTemplate implements View.OnClick
 
 
         btnEmailRegister = (Button) findViewById(R.id.btnEmailRegister);
+        btnEmailSignIn = (Button) findViewById(R.id.btnEmailSignIn);
 
 
 
         // Button click listeners
         btnEmailRegister.setOnClickListener(this);
+        btnEmailSignIn.setOnClickListener(this);
 
         facebookLogIn();
         googleplusLogIn();
@@ -230,15 +234,19 @@ public class RegisterActivity extends MyActivityTemplate implements View.OnClick
     }
 
     private void emailSignIn() {
-        TextView name = (TextView) findViewById(R.id.tvName);
-        TextView email = (TextView) findViewById(R.id.tvEmail);
-        TextView password = (TextView) findViewById(R.id.tvPassword);
+        EditText name = (EditText) findViewById(R.id.etName);
+        EditText email = (EditText) findViewById(R.id.etEmail);
+        EditText password = (EditText) findViewById(R.id.etPassword);
 
         // TODO New activity
         ProfileUser profileUser = new ProfileUser(name, email, password, accountTypes.ACCOUNT_EMAIL);
 
         sessionManager.clearSession();
         sessionManager.setProfileUser(profileUser);
+
+        Intent intent = new Intent(RegisterActivity.this, MenuActivity.class);
+        startActivity(intent);
+        finish();
     }
 
     private void emailRegister() {

@@ -50,6 +50,7 @@ public class MenuActivity extends MyActivityTemplate {
         final ViewPager viewPager = (ViewPager) findViewById(R.id.viewPager);
 
         fragmentPagerAdapter = new MyPagerAdapter(getSupportFragmentManager(), tabLayout.getTabCount());
+        viewPager.setOffscreenPageLimit(1);
         viewPager.setAdapter(fragmentPagerAdapter);
 
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
