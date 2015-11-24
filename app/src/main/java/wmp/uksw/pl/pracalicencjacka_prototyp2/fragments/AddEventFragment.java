@@ -5,14 +5,13 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import wmp.uksw.pl.pracalicencjacka_prototyp2.R;
 
 /**
  * Created by MSI on 2015-11-24.
  */
-public class UserProfileFragment extends Fragment {
+public class AddEventFragment extends Fragment {
 
     // Store instance variables
     private String title;
@@ -21,7 +20,7 @@ public class UserProfileFragment extends Fragment {
     // Inflate the view for the fragment based on layout XML
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_userprofile, container, false);
+        View view = inflater.inflate(R.layout.fragment_addevent, container, false);
 
         return view;
     }

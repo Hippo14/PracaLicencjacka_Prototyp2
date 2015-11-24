@@ -2,12 +2,16 @@ package wmp.uksw.pl.pracalicencjacka_prototyp2;
 
 import android.content.Context;
 import android.support.design.widget.Snackbar;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewParent;
@@ -16,6 +20,9 @@ import android.widget.TextView;
 
 import org.w3c.dom.Text;
 
+import wmp.uksw.pl.pracalicencjacka_prototyp2.fragments.AddEventFragment;
+import wmp.uksw.pl.pracalicencjacka_prototyp2.fragments.ManageEventsFragment;
+import wmp.uksw.pl.pracalicencjacka_prototyp2.fragments.MapsFragment;
 import wmp.uksw.pl.pracalicencjacka_prototyp2.fragments.UserProfileFragment;
 import wmp.uksw.pl.pracalicencjacka_prototyp2.template.MyActivityTemplate;
 import wmp.uksw.pl.pracalicencjacka_prototyp2.user.ProfileUser;
@@ -24,7 +31,7 @@ public class MenuActivity extends MyActivityTemplate {
 
     private ProfileUser profileUser;
 
-    FragmentPagerAdapter fragmentPagerAdapter;
+    PagerAdapter fragmentPagerAdapter;
     RelativeLayout relativeLayout;
 
 
@@ -32,30 +39,33 @@ public class MenuActivity extends MyActivityTemplate {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_layout);
+        tabLayout.addTab(tabLayout.newTab().setText("User Profile"));
+        tabLayout.addTab(tabLayout.newTab().setText("Maps"));
+        tabLayout.addTab(tabLayout.newTab().setText("Add Event"));
+        tabLayout.addTab(tabLayout.newTab().setText("Manage Events"));
+        tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
+
         relativeLayout = (RelativeLayout) findViewById(R.id.relativeLayoutMenu);
-        ViewPager viewPager = (ViewPager) findViewById(R.id.viewPager);
-        fragmentPagerAdapter = new MyPagerAdapter(getSupportFragmentManager());
+        final ViewPager viewPager = (ViewPager) findViewById(R.id.viewPager);
+
+        fragmentPagerAdapter = new MyPagerAdapter(getSupportFragmentManager(), tabLayout.getTabCount());
         viewPager.setAdapter(fragmentPagerAdapter);
 
-        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-
-            // This method will be invoked when the current page is scrolled
+        viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
+        tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+            public void onTabSelected(TabLayout.Tab tab) {
+                viewPager.setCurrentItem(tab.getPosition());
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
 
             }
 
-            // This method will be invoked when a new page becomes selected.
             @Override
-            public void onPageSelected(int position) {
-                Snackbar snackbar = Snackbar.make(relativeLayout, "Selected page position: " + position, Snackbar.LENGTH_SHORT);
-                snackbar.show();
-            }
-
-            // Called when the scroll state changes:
-            // SCROLL_STATE_IDLE, SCROLL_STATE_DRAGGING, SCROLL_STATE_SETTLING
-            @Override
-            public void onPageScrollStateChanged(int state) {
+            public void onTabReselected(TabLayout.Tab tab) {
 
             }
         });
@@ -93,12 +103,13 @@ public class MenuActivity extends MyActivityTemplate {
         return getApplicationContext();
     }
 
-    public static class MyPagerAdapter extends FragmentPagerAdapter {
+    public static class MyPagerAdapter extends FragmentStatePagerAdapter {
 
-        private static int NUM_ITEMS = 1;
+        private static int NUM_ITEMS;
 
-        public MyPagerAdapter(FragmentManager fm) {
+        public MyPagerAdapter(FragmentManager fm, int tabCount) {
             super(fm);
+            this.NUM_ITEMS = tabCount;
         }
 
         // Returns the fragment to display for that page
@@ -107,7 +118,13 @@ public class MenuActivity extends MyActivityTemplate {
             // TODO Switch
             switch (position) {
                 case 0:
-                    return UserProfileFragment.newInstance(0, "User Profile");
+                    return new UserProfileFragment();
+                case 1:
+                    return new MapsFragment();
+                case 2:
+                    return new AddEventFragment();
+                case 3:
+                    return new ManageEventsFragment();
             }
             return null;
         }
@@ -116,12 +133,6 @@ public class MenuActivity extends MyActivityTemplate {
         @Override
         public int getCount() {
             return NUM_ITEMS;
-        }
-
-        // Returns the page title for the top indicator
-        @Override
-        public CharSequence getPageTitle(int position) {
-            return "Page " + position;
         }
     }
 }
