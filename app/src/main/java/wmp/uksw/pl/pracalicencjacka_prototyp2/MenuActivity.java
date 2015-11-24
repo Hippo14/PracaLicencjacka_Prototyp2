@@ -120,7 +120,7 @@ public class MenuActivity extends MyActivityTemplate {
                 case 0:
                     return new UserProfileFragment();
                 case 1:
-                    return new MapsFragment();
+                    return MapsFragment.newInstance();
                 case 2:
                     return new AddEventFragment();
                 case 3:
