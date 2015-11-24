@@ -34,14 +34,10 @@ public class MenuActivity extends MyActivityTemplate {
     PagerAdapter fragmentPagerAdapter;
     RelativeLayout relativeLayout;
 
-    public static FragmentManager fragmentManager;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        fragmentManager = getSupportFragmentManager();
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_layout);
         tabLayout.addTab(tabLayout.newTab().setText("User Profile"));
