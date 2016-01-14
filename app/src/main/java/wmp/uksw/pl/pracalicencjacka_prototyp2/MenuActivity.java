@@ -1,29 +1,20 @@
 package wmp.uksw.pl.pracalicencjacka_prototyp2;
 
 import android.content.Context;
-import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.ViewParent;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
 
-import org.w3c.dom.Text;
-
-import wmp.uksw.pl.pracalicencjacka_prototyp2.fragments.AddEventFragment;
-import wmp.uksw.pl.pracalicencjacka_prototyp2.fragments.ManageEventsFragment;
-import wmp.uksw.pl.pracalicencjacka_prototyp2.fragments.MapsFragment;
-import wmp.uksw.pl.pracalicencjacka_prototyp2.fragments.UserProfileFragment;
+import wmp.uksw.pl.pracalicencjacka_prototyp2.fragments.BoardFragment;
+import wmp.uksw.pl.pracalicencjacka_prototyp2.fragments.EventsFragment;
+import wmp.uksw.pl.pracalicencjacka_prototyp2.fragments.UserFragment;
 import wmp.uksw.pl.pracalicencjacka_prototyp2.template.MyActivityTemplate;
 import wmp.uksw.pl.pracalicencjacka_prototyp2.user.ProfileUser;
 
@@ -40,10 +31,9 @@ public class MenuActivity extends MyActivityTemplate {
         super.onCreate(savedInstanceState);
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_layout);
-        tabLayout.addTab(tabLayout.newTab().setText("User Profile"));
-        tabLayout.addTab(tabLayout.newTab().setText("Maps"));
-        tabLayout.addTab(tabLayout.newTab().setText("Add Event"));
-        tabLayout.addTab(tabLayout.newTab().setText("Manage Events"));
+        tabLayout.addTab(tabLayout.newTab().setIcon(R.mipmap.ic_board));
+        tabLayout.addTab(tabLayout.newTab().setIcon(R.mipmap.ic_events));
+        tabLayout.addTab(tabLayout.newTab().setIcon(R.mipmap.ic_user));
         tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
 
         relativeLayout = (RelativeLayout) findViewById(R.id.relativeLayoutMenu);
@@ -119,13 +109,11 @@ public class MenuActivity extends MyActivityTemplate {
             // TODO Switch
             switch (position) {
                 case 0:
-                    return new UserProfileFragment();
+                    return new BoardFragment();
                 case 1:
-                    return MapsFragment.newInstance();
+                    return new EventsFragment();
                 case 2:
-                    return new AddEventFragment();
-                case 3:
-                    return new ManageEventsFragment();
+                    return new UserFragment();
             }
             return null;
         }

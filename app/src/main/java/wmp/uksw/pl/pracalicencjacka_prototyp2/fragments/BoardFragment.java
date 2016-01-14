@@ -12,9 +12,9 @@ import wmp.uksw.pl.pracalicencjacka_prototyp2.helpers.SessionManager;
 import wmp.uksw.pl.pracalicencjacka_prototyp2.user.ProfileUser;
 
 /**
- * Created by MSI on 2015-11-24.
+ * Created by MSI on 2016-01-14.
  */
-public class UserProfileFragment extends Fragment {
+public class BoardFragment extends Fragment {
 
     // Store instance variables
     private String title;
@@ -25,7 +25,7 @@ public class UserProfileFragment extends Fragment {
     // Inflate the view for the fragment based on layout XML
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_userprofile, container, false);
+        View view = inflater.inflate(R.layout.fragment_board, container, false);
 
         sessionManager = new SessionManager(getActivity().getApplicationContext());
 
