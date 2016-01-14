@@ -50,6 +50,10 @@
             android:name="com.google.android.maps.v2.API_KEY"
             android:value="@string/google_maps_key" />
 
+        <activity
+            android:name=".SearchEventActivity"
+            android:label="@string/title_activity_search_event" >
+        </activity>
     </application>
 
 </manifest>
