@@ -3,6 +3,7 @@ package wmp.uksw.pl.pracalicencjacka_prototyp2.helpers;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.Gson;
 
 import wmp.uksw.pl.pracalicencjacka_prototyp2.user.ProfileUser;
@@ -11,7 +12,6 @@ import wmp.uksw.pl.pracalicencjacka_prototyp2.user.ProfileUser;
  * Created by MSI on 2015-11-23.
  */
 public class SessionManager {
-
     // Shared Preferences
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor editor;
@@ -30,6 +30,7 @@ public class SessionManager {
     private final String KEY_IS_EMAIL = "email";
     private final String KEY_IS_ACCOUNT_TYPE = "accountType";
     private final String KEY_IS_PROFILEUSER = "ProfileUser";
+    private  final String KEY_IS_LOCATION = "Location";
 
     public SessionManager(Context context) {
         this.context = context;
@@ -59,6 +60,13 @@ public class SessionManager {
         this.editor.commit();
     }
 
+    public void setLatLng(LatLng location) {
+        Gson gson = new Gson();
+        String json = gson.toJson(location);
+        this.editor.putString(KEY_IS_LOCATION, json);
+        this.editor.commit();
+    }
+
     public ProfileUser getProfileUser() {
         Gson gson = new Gson();
         String json = this.sharedPreferences.getString(KEY_IS_PROFILEUSER, "empty");
@@ -73,6 +81,14 @@ public class SessionManager {
 
     public String getEmail() {
         return this.sharedPreferences.getString(KEY_IS_EMAIL, "empty");
+    }
+
+    public LatLng getLatLnt() {
+        Gson gson = new Gson();
+        String json = this.sharedPreferences.getString(KEY_IS_LOCATION, "empty");
+        LatLng location = gson.fromJson(json, LatLng.class);
+
+        return location;
     }
 
     public void clearSession() {

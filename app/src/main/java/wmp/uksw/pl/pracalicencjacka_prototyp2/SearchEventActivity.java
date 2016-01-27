@@ -1,6 +1,7 @@
 package wmp.uksw.pl.pracalicencjacka_prototyp2;
 
 import android.content.Context;
+import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.AsyncTask;
@@ -15,6 +16,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
+
+import com.google.android.gms.maps.model.LatLng;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -55,9 +58,16 @@ public class SearchEventActivity extends MyActivityTemplate {
         AdapterView.OnItemClickListener onItemClickListener = new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Address address = list.get(position);
+                // Go to MapsActivity
 
-                Log.d("SearchActivity", address.getAddressLine(0) + " " + address.getAddressLine(1));
+                // Save searched location as (x, y)
+                LatLng location = new LatLng(list.get(position).getLatitude(), list.get(position).getLongitude());
+                sessionManager.setLatLng(location);
+
+                // Intent to GoogleMaps Activity
+                Intent intent = new Intent(getContext(), MapsActivity.class);
+                startActivity(intent);
+                finish();
             }
         };
 
