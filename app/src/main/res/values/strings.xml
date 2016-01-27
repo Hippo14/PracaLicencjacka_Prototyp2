@@ -20,4 +20,7 @@
     <string name="EmailButton">Sign in with E-mail</string>
     <string name="title_activity_maps">Map</string>
     <string name="title_activity_search_event">SearchEventActivity</string>
+
+    <string name="find">Find</string>
+    <string name="hint">Enter Place</string>
 </resources>
