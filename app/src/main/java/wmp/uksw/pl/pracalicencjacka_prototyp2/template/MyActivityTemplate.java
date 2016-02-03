@@ -20,9 +20,6 @@ public abstract class MyActivityTemplate extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Initialize Facebook SDK and set callbackManager
-        FacebookSdk.sdkInitialize(getContext());
-
         //creates SessionManager object that helps with managing
         sessionManager = new SessionManager(getContext());
 

@@ -1,10 +1,7 @@
 package wmp.uksw.pl.pracalicencjacka_prototyp2;
 
-import android.content.Context;
-import android.os.AsyncTask;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -16,7 +13,6 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import wmp.uksw.pl.pracalicencjacka_prototyp2.helpers.SessionManager;
-import wmp.uksw.pl.pracalicencjacka_prototyp2.template.MyActivityTemplate;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 

@@ -1,25 +1,30 @@
 package wmp.uksw.pl.pracalicencjacka_prototyp2;
 
-import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.content.pm.Signature;
 import android.os.Bundle;
-import android.util.Base64;
+
+import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
-import android.widget.TextView;
+import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
+import com.facebook.FacebookSdk;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
 import com.facebook.Profile;
@@ -36,29 +41,30 @@ import com.google.android.gms.common.api.GoogleApiClient;
 
 import org.json.JSONObject;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 import wmp.uksw.pl.pracalicencjacka_prototyp2.constants.accountTypes;
-import wmp.uksw.pl.pracalicencjacka_prototyp2.template.MyActivityTemplate;
-import wmp.uksw.pl.pracalicencjacka_prototyp2.user.EmailUser;
+import wmp.uksw.pl.pracalicencjacka_prototyp2.dialogs.MySpinnerDialog;
+import wmp.uksw.pl.pracalicencjacka_prototyp2.helpers.RegisterRequest;
+import wmp.uksw.pl.pracalicencjacka_prototyp2.helpers.SessionManager;
 import wmp.uksw.pl.pracalicencjacka_prototyp2.user.ProfileUser;
 
-public class RegisterActivity extends MyActivityTemplate implements View.OnClickListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+public class RegisterActivity extends FragmentActivity implements View.OnClickListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     private static final int RC_SIGN_IN = 0;
+
+    private boolean success = false;
 
     private GoogleApiClient mGoogleApiClient;
     private CallbackManager callbackManager;
 
     private Button btnEmailRegister;
-    private Button btnEmailSignIn;
     private SignInButton btnGooglePlusRegister;
     private LoginButton btnFacebookRegister;
 
-    // EMAIL  USER
-    private EmailUser emailUser;
+    public SessionManager sessionManager;
 
     // GOOGLE PLUS USER
     private GoogleSignInAccount googleplusUser;
@@ -74,18 +80,17 @@ public class RegisterActivity extends MyActivityTemplate implements View.OnClick
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // Initialize Facebook SDK and set callbackManager
+        FacebookSdk.sdkInitialize(getApplicationContext());
+        setContentView(R.layout.activity_register);
+
+        sessionManager = new SessionManager(getApplicationContext());
 
         callbackManager = CallbackManager.Factory.create();
-
-
         btnEmailRegister = (Button) findViewById(R.id.btnEmailRegister);
-        btnEmailSignIn = (Button) findViewById(R.id.btnEmailSignIn);
-
-
 
         // Button click listeners
         btnEmailRegister.setOnClickListener(this);
-        btnEmailSignIn.setOnClickListener(this);
 
         facebookLogIn();
         googleplusLogIn();
@@ -93,7 +98,6 @@ public class RegisterActivity extends MyActivityTemplate implements View.OnClick
 
     public void facebookLogIn() {
         btnFacebookRegister = (LoginButton) findViewById(R.id.btnFacebookRegister);
-
 
         // Facebook button permissions
         btnFacebookRegister.setReadPermissions(Arrays.asList("public_profile", "user_friends", "email", "user_birthday"));
@@ -165,23 +169,6 @@ public class RegisterActivity extends MyActivityTemplate implements View.OnClick
         btnGooglePlusRegister.setOnClickListener(this);
     }
 
-    public static String printHashKey(Context ctx) {
-        // Add code to print out the key hash
-        try {
-            PackageInfo info = ctx.getPackageManager().getPackageInfo(ctx.getPackageName(), PackageManager.GET_SIGNATURES);
-            for (Signature signature : info.signatures) {
-                MessageDigest md = MessageDigest.getInstance("SHA");
-                md.update(signature.toByteArray());
-                return Base64.encodeToString(md.digest(), Base64.DEFAULT);
-            }
-        } catch (PackageManager.NameNotFoundException e) {
-            return "SHA-1 generation: the key count not be generated: NameNotFoundException thrown";
-        } catch (NoSuchAlgorithmException e) {
-            return "SHA-1 generation: the key count not be generated: NoSuchAlgorithmException thrown";
-        }
-
-        return "SHA-1 generation: epic failed";
-    }
 
     @Override
     protected void onResume() {
@@ -222,9 +209,6 @@ public class RegisterActivity extends MyActivityTemplate implements View.OnClick
                 googlePlusSignIn();
                 break;
             case R.id.btnEmailRegister:
-                emailRegister();
-                break;
-            case R.id.btnEmailSignIn:
                 emailSignIn();
                 break;
             case R.id.btnFacebookRegister:
@@ -241,22 +225,14 @@ public class RegisterActivity extends MyActivityTemplate implements View.OnClick
         // TODO New activity
         ProfileUser profileUser = new ProfileUser(name, email, password, accountTypes.ACCOUNT_EMAIL);
 
-        sessionManager.clearSession();
-        sessionManager.setProfileUser(profileUser);
+        if (verify(profileUser)) {
+            sessionManager.clearSession();
+            sessionManager.setProfileUser(profileUser);
 
-        Intent intent = new Intent(RegisterActivity.this, MenuActivity.class);
-        startActivity(intent);
-        finish();
-    }
-
-    private void emailRegister() {
-        LinearLayout linearLayout = (LinearLayout) findViewById(R.id.layoutRegister);
-        if (linearLayout.getVisibility() == View.VISIBLE)
-            linearLayout.setVisibility(View.INVISIBLE);
-        else
-            linearLayout.setVisibility(View.VISIBLE);
-
-
+            Intent intent = new Intent(RegisterActivity.this, MenuActivity.class);
+            startActivity(intent);
+            finish();
+        }
     }
 
     private void facebookSignIn() {
@@ -352,13 +328,50 @@ public class RegisterActivity extends MyActivityTemplate implements View.OnClick
 
     }
 
-    @Override
-    protected int getLayoutResourceId() {
-        return R.layout.activity_register;
+    public boolean verify(final ProfileUser profileUser) {
+
+
+        String url = "http://lubiekokosy.pl/pracalicencjacka/user.php";
+
+        final RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
+
+        Map<String, String> params = new HashMap<>();
+        params.put("name", "Hippo");
+
+
+        StringRequest request = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                Log.d("Response", response);
+                success = true;
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d("Response", error.toString());
+                success = false;
+            }
+        }) {
+
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String,String> params  = new HashMap<String, String>();
+                params.put("name", "Hippo");
+
+                return params;
+            }
+        };
+
+        requestQueue.add(request);
+
+        return success;
     }
 
-    @Override
-    protected Context getContext() {
-        return getApplicationContext();
+    public interface PostRegisterResponseListener {
+
+        public void requestStarted();
+        public void requestCompleted(JSONObject response);
+        public void requestEndedWithError(VolleyError error);
+
     }
 }

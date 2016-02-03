@@ -12,19 +12,10 @@
         android:background="#ffffff"
         android:id="@+id/Board_searchEvent">
 
-        <ImageButton
-            android:layout_width="64dp"
-            android:layout_height="64dp"
-            android:id="@+id/imageButton"
-            android:background="@mipmap/ic_search" />
-
-        <TextView
-            android:layout_width="wrap_content"
+        <SearchView
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="Click to search Events!"
-            android:layout_marginTop="16dp"
-            android:layout_marginLeft="16dp" />
+            android:id="@+id/searchView" />
     </LinearLayout>
 
     <LinearLayout

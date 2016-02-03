@@ -52,4 +52,8 @@ public class ProfileUser {
     public String getAccountType() {
         return accountType;
     }
+
+    public String getPassword() {
+        return password;
+    }
 }
