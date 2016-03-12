@@ -80,11 +80,22 @@ public class RegisterActivity extends FragmentActivity implements View.OnClickLi
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        sessionManager = new SessionManager(getApplicationContext());
+
+        // Check if user was logging before
+        profileUser = sessionManager.getProfileUser();
+        if (profileUser == null || profileUser.getName() == "" || profileUser.getName() == null) {
+            // New activity
+            Intent intent = new Intent(RegisterActivity.this, MenuActivity.class);
+            startActivity(intent);
+            finish();
+        }
+
+
         // Initialize Facebook SDK and set callbackManager
         FacebookSdk.sdkInitialize(getApplicationContext());
         setContentView(R.layout.activity_register);
-
-        sessionManager = new SessionManager(getApplicationContext());
 
         callbackManager = CallbackManager.Factory.create();
         btnEmailRegister = (Button) findViewById(R.id.btnEmailRegister);
@@ -329,14 +340,15 @@ public class RegisterActivity extends FragmentActivity implements View.OnClickLi
     }
 
     public boolean verify(final ProfileUser profileUser) {
-
-
         String url = "http://lubiekokosy.pl/pracalicencjacka/user.php";
 
         final RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
 
         Map<String, String> params = new HashMap<>();
-        params.put("name", "Hippo");
+        params.put("name", profileUser.getName());
+        params.put("email", profileUser.getEmail());
+        params.put("accountType", profileUser.getAccountType());
+        params.put("password", profileUser.getPassword());
 
 
         StringRequest request = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {

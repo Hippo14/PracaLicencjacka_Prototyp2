@@ -70,7 +70,12 @@ public class SessionManager {
     public ProfileUser getProfileUser() {
         Gson gson = new Gson();
         String json = this.sharedPreferences.getString(KEY_IS_PROFILEUSER, "empty");
-        ProfileUser object = gson.fromJson(json, ProfileUser.class);
+
+        ProfileUser object = null;
+
+        if (json != "empty")
+            object = gson.fromJson(json, ProfileUser.class);
+
 
         return object;
     }
