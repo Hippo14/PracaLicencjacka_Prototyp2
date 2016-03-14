@@ -1,5 +1,6 @@
 package wmp.uksw.pl.pracalicencjacka_prototyp2.fragments;
 
+import android.content.Intent;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -20,6 +21,7 @@ import com.android.volley.toolbox.Volley;
 
 import org.json.JSONObject;
 
+import wmp.uksw.pl.pracalicencjacka_prototyp2.EventAddActivity;
 import wmp.uksw.pl.pracalicencjacka_prototyp2.R;
 
 /**
@@ -40,7 +42,10 @@ public class EventsFragment extends Fragment {
             @Override
             public void onClick(View v) {
 
-                Snackbar.make(view.findViewById(R.id.frameLayout), "Hello World!", Snackbar.LENGTH_LONG).show();
+                //Snackbar.make(view.findViewById(R.id.frameLayout), "Hello World!", Snackbar.LENGTH_LONG).show();
+
+                Intent intent = new Intent(getContext(), EventAddActivity.class);
+                startActivity(intent);
 
 //                Snackbar.make(view.findViewById(R.id.frameLayout), "Click on row to know more details", Snackbar.LENGTH_LONG)
 //                        .setAction("OK", new View.OnClickListener() {
