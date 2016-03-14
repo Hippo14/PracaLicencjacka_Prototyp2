@@ -45,10 +45,12 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import wmp.uksw.pl.pracalicencjacka_prototyp2.conf.URL;
 import wmp.uksw.pl.pracalicencjacka_prototyp2.constants.accountTypes;
 import wmp.uksw.pl.pracalicencjacka_prototyp2.dialogs.MySpinnerDialog;
 import wmp.uksw.pl.pracalicencjacka_prototyp2.helpers.RegisterRequest;
 import wmp.uksw.pl.pracalicencjacka_prototyp2.helpers.SessionManager;
+import wmp.uksw.pl.pracalicencjacka_prototyp2.helpers.VolleyErrorHelper;
 import wmp.uksw.pl.pracalicencjacka_prototyp2.user.ProfileUser;
 
 public class RegisterActivity extends FragmentActivity implements View.OnClickListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
@@ -84,100 +86,100 @@ public class RegisterActivity extends FragmentActivity implements View.OnClickLi
         sessionManager = new SessionManager(getApplicationContext());
 
         // Check if user was logging before
-        profileUser = sessionManager.getProfileUser();
-        if (profileUser == null || profileUser.getName() == "" || profileUser.getName() == null) {
-            // New activity
-            Intent intent = new Intent(RegisterActivity.this, MenuActivity.class);
-            startActivity(intent);
-            finish();
-        }
+//        profileUser = sessionManager.getProfileUser();
+//        if (profileUser == null || profileUser.getName() == "" || profileUser.getName() == null) {
+//            // New activity
+//            Intent intent = new Intent(RegisterActivity.this, MenuActivity.class);
+//            startActivity(intent);
+//            finish();
+//        }
 
 
-        // Initialize Facebook SDK and set callbackManager
-        FacebookSdk.sdkInitialize(getApplicationContext());
+//        // Initialize Facebook SDK and set callbackManager
+//        FacebookSdk.sdkInitialize(getApplicationContext());
         setContentView(R.layout.activity_register);
 
-        callbackManager = CallbackManager.Factory.create();
+        //callbackManager = CallbackManager.Factory.create();
         btnEmailRegister = (Button) findViewById(R.id.btnEmailRegister);
 
         // Button click listeners
         btnEmailRegister.setOnClickListener(this);
 
-        facebookLogIn();
-        googleplusLogIn();
+        //facebookLogIn();
+        //googleplusLogIn();
     }
 
     public void facebookLogIn() {
-        btnFacebookRegister = (LoginButton) findViewById(R.id.btnFacebookRegister);
-
-        // Facebook button permissions
-        btnFacebookRegister.setReadPermissions(Arrays.asList("public_profile", "user_friends", "email", "user_birthday"));
-
-        // Callback registration
-        btnFacebookRegister.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
-            @Override
-            public void onSuccess(final LoginResult loginResult) {
-                GraphRequest request = GraphRequest.newMeRequest(
-                        loginResult.getAccessToken(),
-                        new GraphRequest.GraphJSONObjectCallback() {
-                            @Override
-                            public void onCompleted(
-                                    JSONObject object,
-                                    GraphResponse response) {
-                                // Application code
-                                facebookJSON = response.getJSONObject();
-                                facebookAccessToken = loginResult.getAccessToken();
-                                facebookProfile = Profile.getCurrentProfile();
-
-                                // TODO New activity
-                                profileUser = new ProfileUser(facebookJSON, facebookProfile, accountTypes.ACCOUNT_FACEBOOK);
-
-                                sessionManager.clearSession();
-                                sessionManager.setProfileUser(profileUser);
-
-                                Intent intent = new Intent(RegisterActivity.this, MenuActivity.class);
-                                startActivity(intent);
-                                finish();
-                            }
-                        });
-                Bundle parameters = new Bundle();
-                parameters.putString("fields", "id, name, link, gender, birthday, email");
-                request.setParameters(parameters);
-                request.executeAsync();
-
-                Log.e("Parameters", request.getParameters().getString("fields"));
-            }
-
-            @Override
-            public void onCancel() {
-
-            }
-
-            @Override
-            public void onError(FacebookException e) {
-
-            }
-        });
-        btnFacebookRegister.setOnClickListener(this);
+//        btnFacebookRegister = (LoginButton) findViewById(R.id.btnFacebookRegister);
+//
+//        // Facebook button permissions
+//        btnFacebookRegister.setReadPermissions(Arrays.asList("public_profile", "user_friends", "email", "user_birthday"));
+//
+//        // Callback registration
+//        btnFacebookRegister.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
+//            @Override
+//            public void onSuccess(final LoginResult loginResult) {
+//                GraphRequest request = GraphRequest.newMeRequest(
+//                        loginResult.getAccessToken(),
+//                        new GraphRequest.GraphJSONObjectCallback() {
+//                            @Override
+//                            public void onCompleted(
+//                                    JSONObject object,
+//                                    GraphResponse response) {
+//                                // Application code
+//                                facebookJSON = response.getJSONObject();
+//                                facebookAccessToken = loginResult.getAccessToken();
+//                                facebookProfile = Profile.getCurrentProfile();
+//
+//                                // TODO New activity
+//                                profileUser = new ProfileUser(facebookJSON, facebookProfile, accountTypes.ACCOUNT_FACEBOOK);
+//
+//                                if (verify(profileUser)) {
+//                                    updateUI(true);
+//                                }
+//                                else {
+//                                    updateUI(false);
+//                                }
+//                            }
+//                        });
+//                Bundle parameters = new Bundle();
+//                parameters.putString("fields", "id, name, link, gender, birthday, email");
+//                request.setParameters(parameters);
+//                request.executeAsync();
+//
+//                Log.e("Parameters", request.getParameters().getString("fields"));
+//            }
+//
+//            @Override
+//            public void onCancel() {
+//
+//            }
+//
+//            @Override
+//            public void onError(FacebookException e) {
+//
+//            }
+//        });
+//        btnFacebookRegister.setOnClickListener(this);
     }
 
     public void googleplusLogIn() {
-        btnGooglePlusRegister = (SignInButton) findViewById(R.id.btnGooglePlusRegister);
-
-        // Configure sign-in to request the user's ID, email address, and basic
-        // profile. ID and basic profile are included in DEFAULT_SIGN_IN.
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestEmail()
-                .build();
-
-        // Build a GoogleApiClient with access to the Google Sign-In API and the
-        // options specified by gso.
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .enableAutoManage(this, this)
-                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
-                .build();
-
-        btnGooglePlusRegister.setOnClickListener(this);
+//        btnGooglePlusRegister = (SignInButton) findViewById(R.id.btnGooglePlusRegister);
+//
+//        // Configure sign-in to request the user's ID, email address, and basic
+//        // profile. ID and basic profile are included in DEFAULT_SIGN_IN.
+//        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+//                .requestEmail()
+//                .build();
+//
+//        // Build a GoogleApiClient with access to the Google Sign-In API and the
+//        // options specified by gso.
+//        mGoogleApiClient = new GoogleApiClient.Builder(this)
+//                .enableAutoManage(this, this)
+//                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
+//                .build();
+//
+//        btnGooglePlusRegister.setOnClickListener(this);
     }
 
 
@@ -201,30 +203,30 @@ public class RegisterActivity extends FragmentActivity implements View.OnClickLi
     protected void onStart() {
         super.onStart();
 
-        mGoogleApiClient.connect();
+        //mGoogleApiClient.connect();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
 
-        if (mGoogleApiClient.isConnected()) {
-            mGoogleApiClient.disconnect();
-        }
+//        if (mGoogleApiClient.isConnected()) {
+//            mGoogleApiClient.disconnect();
+//        }
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.btnGooglePlusRegister:
-                googlePlusSignIn();
-                break;
+           // case R.id.btnGooglePlusRegister:
+                //googlePlusSignIn();
+           //     break;
             case R.id.btnEmailRegister:
                 emailSignIn();
                 break;
-            case R.id.btnFacebookRegister:
-                facebookSignIn();
-                break;
+           // case R.id.btnFacebookRegister:
+                //facebookSignIn();
+           //     break;
         }
     }
 
@@ -237,12 +239,10 @@ public class RegisterActivity extends FragmentActivity implements View.OnClickLi
         ProfileUser profileUser = new ProfileUser(name, email, password, accountTypes.ACCOUNT_EMAIL);
 
         if (verify(profileUser)) {
-            sessionManager.clearSession();
-            sessionManager.setProfileUser(profileUser);
-
-            Intent intent = new Intent(RegisterActivity.this, MenuActivity.class);
-            startActivity(intent);
-            finish();
+            updateUI(true);
+        }
+        else {
+            updateUI(false);
         }
     }
 
@@ -270,23 +270,25 @@ public class RegisterActivity extends FragmentActivity implements View.OnClickLi
     }
 
     private void handleSignInResult(GoogleSignInResult result) {
-        if (result.isSuccess()) {
-            // Signed in successfully, show authenticated UI.
-            googleplusUser = result.getSignInAccount();
-
-            // TODO New activity
-            profileUser = new ProfileUser(googleplusUser, accountTypes.ACCOUNT_GOOGLEPLUS);
-
-            sessionManager.clearSession();
-            sessionManager.setProfileUser(profileUser);
-
-            Intent intent = new Intent(RegisterActivity.this, MenuActivity.class);
-            startActivity(intent);
-            finish();
-        } else {
-            // Signed out, show unauthenticated UI.
-            updateUI(false);
-        }
+//        if (result.isSuccess()) {
+//            // Signed in successfully, show authenticated UI.
+//            googleplusUser = result.getSignInAccount();
+//
+//            // TODO New activity
+//            profileUser = new ProfileUser(googleplusUser, accountTypes.ACCOUNT_GOOGLEPLUS);
+//
+//
+//
+//            if (verify(profileUser)) {
+//                updateUI(true);
+//            } else {
+//                // Signed out, show unauthenticated UI.
+//                updateUI(false);
+//           }
+//        } else {
+//            // Signed out, show unauthenticated UI.
+//            updateUI(false);
+//        }
     }
 
     @Override
@@ -313,14 +315,14 @@ public class RegisterActivity extends FragmentActivity implements View.OnClickLi
 
     @Override
     public void onConnected(Bundle arg0) {
-        // Update the UI after signin
-        updateUI(true);
+//        // Update the UI after signin
+//        updateUI(true);
     }
 
     @Override
     public void onConnectionSuspended(int arg0) {
-        mGoogleApiClient.connect();
-        updateUI(false);
+//        mGoogleApiClient.connect();
+//        updateUI(false);
     }
 
     /**
@@ -328,7 +330,12 @@ public class RegisterActivity extends FragmentActivity implements View.OnClickLi
      */
     private void updateUI(boolean isSignedIn) {
         if (isSignedIn) {
+            sessionManager.clearSession();
+            sessionManager.setProfileUser(profileUser);
 
+            Intent intent = new Intent(RegisterActivity.this, MenuActivity.class);
+            startActivity(intent);
+            finish();
         } else {
 
         }
@@ -340,16 +347,19 @@ public class RegisterActivity extends FragmentActivity implements View.OnClickLi
     }
 
     public boolean verify(final ProfileUser profileUser) {
-        String url = "http://lubiekokosy.pl/pracalicencjacka/user.php";
+        if (profileUser == null)
+            return false;
+        else
+            if (profileUser.getName() == "" || profileUser.getEmail() == "" || profileUser.getPassword() == "")
+                return false;
+
+
+
+        String url = URL.validate;
 
         final RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
 
-        Map<String, String> params = new HashMap<>();
-        params.put("name", profileUser.getName());
-        params.put("email", profileUser.getEmail());
-        params.put("accountType", profileUser.getAccountType());
-        params.put("password", profileUser.getPassword());
-
+        Map<String, String> params = profileUser.buildMapToValidate(profileUser);
 
         StringRequest request = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
             @Override
@@ -361,6 +371,8 @@ public class RegisterActivity extends FragmentActivity implements View.OnClickLi
             @Override
             public void onErrorResponse(VolleyError error) {
                 Log.d("Response", error.toString());
+                Toast.makeText(getApplicationContext(), VolleyErrorHelper.getMessage(error, getApplicationContext()), Toast.LENGTH_LONG).show();
+                //Toast.makeText(getApplicationContext(), error.toString(), Toast.LENGTH_LONG).show();
                 success = false;
             }
         }) {
@@ -368,7 +380,8 @@ public class RegisterActivity extends FragmentActivity implements View.OnClickLi
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
                 Map<String,String> params  = new HashMap<String, String>();
-                params.put("name", "Hippo");
+                //params.put("name", "Hippo");
+                params = profileUser.buildMapToValidate(profileUser);
 
                 return params;
             }
@@ -379,11 +392,4 @@ public class RegisterActivity extends FragmentActivity implements View.OnClickLi
         return success;
     }
 
-    public interface PostRegisterResponseListener {
-
-        public void requestStarted();
-        public void requestCompleted(JSONObject response);
-        public void requestEndedWithError(VolleyError error);
-
-    }
 }

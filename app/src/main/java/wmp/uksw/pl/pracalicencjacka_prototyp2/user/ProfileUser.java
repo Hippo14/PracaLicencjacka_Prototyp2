@@ -8,6 +8,9 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Created by MSI on 2015-11-21.
  */
@@ -39,6 +42,20 @@ public class ProfileUser {
         this.email = email.getText().toString();
         this.password = password.getText().toString();
         this.accountType = accountType;
+    }
+
+    public Map<String, String> buildMapToValidate(ProfileUser profileUser) {
+        Map<String, String> params = new HashMap<>();
+
+        params.put("name", profileUser.getName());
+        params.put("email", profileUser.getEmail());
+        params.put("accountType", profileUser.getAccountType());
+        if (profileUser.getPassword() == null)
+            params.put("password", "");
+        else
+            params.put("password", profileUser.getPassword());
+
+        return params;
     }
 
     public String getName() {
