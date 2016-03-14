@@ -1,5 +1,7 @@
 package wmp.uksw.pl.pracalicencjacka_prototyp2.fragments;
 
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -25,19 +27,30 @@ import wmp.uksw.pl.pracalicencjacka_prototyp2.R;
  */
 public class EventsFragment extends Fragment {
 
-    // Store instance variables
-    private String title;
-    private int page;
 
-    TextView test;
+    private FloatingActionButton FAB;
 
     // Inflate the view for the fragment based on layout XML
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_events, container, false);
+        final View view = inflater.inflate(R.layout.fragment_events, container, false);
 
-        test = (TextView) view.findViewById(R.id.testView);
+        FAB = (FloatingActionButton) view.findViewById(R.id.FAB);
+        FAB.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
 
+                Snackbar.make(view.findViewById(R.id.frameLayout), "Hello World!", Snackbar.LENGTH_LONG).show();
+
+//                Snackbar.make(view.findViewById(R.id.frameLayout), "Click on row to know more details", Snackbar.LENGTH_LONG)
+//                        .setAction("OK", new View.OnClickListener() {
+//                            @Override
+//                            public void onClick(View v) {
+//
+//                            }
+//                        }).show();
+            }
+        });
         return view;
     }
 
