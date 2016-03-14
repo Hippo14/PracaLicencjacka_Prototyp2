@@ -1,10 +1,15 @@
 package wmp.uksw.pl.pracalicencjacka_prototyp2.fragments;
 
+import android.media.Image;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,18 +30,34 @@ import wmp.uksw.pl.pracalicencjacka_prototyp2.R;
  */
 public class EventsFragment extends Fragment {
 
-    // Store instance variables
-    private String title;
-    private int page;
+    FloatingActionButton FAB;
 
     TextView test;
 
     // Inflate the view for the fragment based on layout XML
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_events, container, false);
+        final View view = inflater.inflate(R.layout.fragment_events, container, false);
 
-        test = (TextView) view.findViewById(R.id.testView);
+
+        FAB = (FloatingActionButton) view.findViewById(R.id.fab_btn);
+        FAB.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Snackbar.make(view.findViewById(R.id.frameLayout), "Hello World!", Snackbar.LENGTH_LONG).show();
+
+//                Snackbar.make(view.findViewById(R.id.frameLayout), "Click on row to know more details", Snackbar.LENGTH_LONG)
+//                        .setAction("OK", new View.OnClickListener() {
+//                            @Override
+//                            public void onClick(View v) {
+//
+//                            }
+//                        }).show();
+            }
+        });
+
+
 
         return view;
     }
@@ -44,6 +65,8 @@ public class EventsFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+
 
 //        String url ="http://lubiekokosy.pl/php/android.php";
 //

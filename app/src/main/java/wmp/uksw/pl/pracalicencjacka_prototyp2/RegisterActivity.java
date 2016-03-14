@@ -85,14 +85,14 @@ public class RegisterActivity extends FragmentActivity implements View.OnClickLi
 
         sessionManager = new SessionManager(getApplicationContext());
 
-        // Check if user was logging before
-//        profileUser = sessionManager.getProfileUser();
-//        if (profileUser == null || profileUser.getName() == "" || profileUser.getName() == null) {
-//            // New activity
-//            Intent intent = new Intent(RegisterActivity.this, MenuActivity.class);
-//            startActivity(intent);
-//            finish();
-//        }
+        //Check if user was logging before
+        profileUser = sessionManager.getProfileUser();
+        if (profileUser == null || profileUser.getName() == "" || profileUser.getName() == null) {
+            // New activity
+            Intent intent = new Intent(RegisterActivity.this, MenuActivity.class);
+            startActivity(intent);
+            finish();
+        }
 
 
 //        // Initialize Facebook SDK and set callbackManager
