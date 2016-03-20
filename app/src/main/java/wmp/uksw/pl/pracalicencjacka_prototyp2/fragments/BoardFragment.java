@@ -1,13 +1,14 @@
 package wmp.uksw.pl.pracalicencjacka_prototyp2.fragments;
 
 import android.content.Intent;
+import android.provider.Settings;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 
@@ -31,7 +32,7 @@ public class BoardFragment extends Fragment {
     private SessionManager sessionManager;
     private List<EventRow> list;
 
-    private LinearLayout linearLayout;
+    private FloatingActionButton searchButton;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -41,7 +42,7 @@ public class BoardFragment extends Fragment {
         ProfileUser profileUser = sessionManager.getProfileUser();
 
         list = new ArrayList<>();
-        list.add(new EventRow("", "Event name", "Event description"));
+        list.add(new EventRow("", "Android ID", Settings.Secure.getString(getActivity().getContentResolver(), Settings.Secure.ANDROID_ID)));
         list.add(new EventRow("", "Event name", "Event description Event description Event description Event description Event description Event description Event description Event description Event description Event description Event description Event description Event description Event description Event description Event description Event description Event description Event description Event description Event description Event description Event description Event description Event description Event description Event description Event description Event description "));
         list.add(new EventRow("", "Event name", "Event description"));
 
@@ -53,13 +54,13 @@ public class BoardFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_board, container, false);
 
-        linearLayout = (LinearLayout) view.findViewById(R.id.Board_searchEvent);
-        linearLayout.setOnClickListener(new View.OnClickListener() {
+        searchButton = (FloatingActionButton) view.findViewById(R.id.searchButton);
+        searchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getActivity(), SearchEventActivity.class);
                 startActivity(intent);
-                getActivity().finish();
+                //getActivity().finish();
             }
         });
 

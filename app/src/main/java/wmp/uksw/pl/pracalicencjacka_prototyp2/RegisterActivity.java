@@ -1,395 +1,263 @@
 package wmp.uksw.pl.pracalicencjacka_prototyp2;
 
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
-
-import android.support.v4.app.FragmentActivity;
-import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.support.design.widget.Snackbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
-
-import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
-import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
-import com.facebook.AccessToken;
-import com.facebook.CallbackManager;
-import com.facebook.FacebookCallback;
-import com.facebook.FacebookException;
-import com.facebook.FacebookSdk;
-import com.facebook.GraphRequest;
-import com.facebook.GraphResponse;
-import com.facebook.Profile;
-import com.facebook.appevents.AppEventsLogger;
-import com.facebook.login.LoginResult;
-import com.facebook.login.widget.LoginButton;
-import com.google.android.gms.auth.api.Auth;
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.auth.api.signin.GoogleSignInResult;
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.SignInButton;
+import com.google.android.gms.appindexing.Action;
+import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.common.api.GoogleApiClient;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
 import wmp.uksw.pl.pracalicencjacka_prototyp2.conf.URL;
 import wmp.uksw.pl.pracalicencjacka_prototyp2.constants.accountTypes;
-import wmp.uksw.pl.pracalicencjacka_prototyp2.dialogs.MySpinnerDialog;
-import wmp.uksw.pl.pracalicencjacka_prototyp2.helpers.RegisterRequest;
-import wmp.uksw.pl.pracalicencjacka_prototyp2.helpers.SessionManager;
+import wmp.uksw.pl.pracalicencjacka_prototyp2.helpers.Validate;
 import wmp.uksw.pl.pracalicencjacka_prototyp2.helpers.VolleyErrorHelper;
-import wmp.uksw.pl.pracalicencjacka_prototyp2.user.ProfileUser;
+import wmp.uksw.pl.pracalicencjacka_prototyp2.template.MyActivityTemplate;
 
-public class RegisterActivity extends FragmentActivity implements View.OnClickListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+public class RegisterActivity extends MyActivityTemplate {
 
-    private static final int RC_SIGN_IN = 0;
+    private EditText inputName;
+    private EditText inputEmail;
+    private EditText inputPassword;
+    private ProgressDialog progressDialog;
 
-    private boolean success = false;
-
-    private GoogleApiClient mGoogleApiClient;
-    private CallbackManager callbackManager;
-
-    private Button btnEmailRegister;
-    private SignInButton btnGooglePlusRegister;
-    private LoginButton btnFacebookRegister;
-
-    public SessionManager sessionManager;
-
-    // GOOGLE PLUS USER
-    private GoogleSignInAccount googleplusUser;
-
-    // FACEBOOK USER
-    private JSONObject facebookJSON;
-    private AccessToken facebookAccessToken;
-    private Profile facebookProfile;
-
-    // APPLICATION USER
-    private ProfileUser profileUser;
+    private Button btnLogin;
+    private Button btnRegister;
+    /**
+     * ATTENTION: This was auto-generated to implement the App Indexing API.
+     * See https://g.co/AppIndexing/AndroidStudio for more information.
+     */
+    private GoogleApiClient client;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        sessionManager = new SessionManager(getApplicationContext());
+        inputName = (EditText) findViewById(R.id.etName);
+        inputEmail = (EditText) findViewById(R.id.etEmail);
+        inputPassword = (EditText) findViewById(R.id.etPassword);
 
-        // Check if user was logging before
-//        profileUser = sessionManager.getProfileUser();
-//        if (profileUser == null || profileUser.getName() == "" || profileUser.getName() == null) {
-//            // New activity
-//            Intent intent = new Intent(RegisterActivity.this, MenuActivity.class);
-//            startActivity(intent);
-//            finish();
-//        }
+        btnLogin = (Button) findViewById(R.id.btnEmailRegister);
 
+        // Progress dialog
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setCancelable(false);
 
-//        // Initialize Facebook SDK and set callbackManager
-//        FacebookSdk.sdkInitialize(getApplicationContext());
-        setContentView(R.layout.activity_register);
-
-        //callbackManager = CallbackManager.Factory.create();
-        btnEmailRegister = (Button) findViewById(R.id.btnEmailRegister);
-
-        // Button click listeners
-        btnEmailRegister.setOnClickListener(this);
-
-        //facebookLogIn();
-        //googleplusLogIn();
-    }
-
-    public void facebookLogIn() {
-//        btnFacebookRegister = (LoginButton) findViewById(R.id.btnFacebookRegister);
-//
-//        // Facebook button permissions
-//        btnFacebookRegister.setReadPermissions(Arrays.asList("public_profile", "user_friends", "email", "user_birthday"));
-//
-//        // Callback registration
-//        btnFacebookRegister.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
-//            @Override
-//            public void onSuccess(final LoginResult loginResult) {
-//                GraphRequest request = GraphRequest.newMeRequest(
-//                        loginResult.getAccessToken(),
-//                        new GraphRequest.GraphJSONObjectCallback() {
-//                            @Override
-//                            public void onCompleted(
-//                                    JSONObject object,
-//                                    GraphResponse response) {
-//                                // Application code
-//                                facebookJSON = response.getJSONObject();
-//                                facebookAccessToken = loginResult.getAccessToken();
-//                                facebookProfile = Profile.getCurrentProfile();
-//
-//                                // TODO New activity
-//                                profileUser = new ProfileUser(facebookJSON, facebookProfile, accountTypes.ACCOUNT_FACEBOOK);
-//
-//                                if (verify(profileUser)) {
-//                                    updateUI(true);
-//                                }
-//                                else {
-//                                    updateUI(false);
-//                                }
-//                            }
-//                        });
-//                Bundle parameters = new Bundle();
-//                parameters.putString("fields", "id, name, link, gender, birthday, email");
-//                request.setParameters(parameters);
-//                request.executeAsync();
-//
-//                Log.e("Parameters", request.getParameters().getString("fields"));
-//            }
-//
-//            @Override
-//            public void onCancel() {
-//
-//            }
-//
-//            @Override
-//            public void onError(FacebookException e) {
-//
-//            }
-//        });
-//        btnFacebookRegister.setOnClickListener(this);
-    }
-
-    public void googleplusLogIn() {
-//        btnGooglePlusRegister = (SignInButton) findViewById(R.id.btnGooglePlusRegister);
-//
-//        // Configure sign-in to request the user's ID, email address, and basic
-//        // profile. ID and basic profile are included in DEFAULT_SIGN_IN.
-//        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-//                .requestEmail()
-//                .build();
-//
-//        // Build a GoogleApiClient with access to the Google Sign-In API and the
-//        // options specified by gso.
-//        mGoogleApiClient = new GoogleApiClient.Builder(this)
-//                .enableAutoManage(this, this)
-//                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
-//                .build();
-//
-//        btnGooglePlusRegister.setOnClickListener(this);
-    }
-
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        // Logs 'install' and 'app activate' App Events.
-        AppEventsLogger.activateApp(this);
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-
-        // Logs 'app deactivate' App Event.
-        AppEventsLogger.deactivateApp(this);
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-
-        //mGoogleApiClient.connect();
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-
-//        if (mGoogleApiClient.isConnected()) {
-//            mGoogleApiClient.disconnect();
-//        }
-    }
-
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-           // case R.id.btnGooglePlusRegister:
-                //googlePlusSignIn();
-           //     break;
-            case R.id.btnEmailRegister:
-                emailSignIn();
-                break;
-           // case R.id.btnFacebookRegister:
-                //facebookSignIn();
-           //     break;
-        }
-    }
-
-    private void emailSignIn() {
-        EditText name = (EditText) findViewById(R.id.etName);
-        EditText email = (EditText) findViewById(R.id.etEmail);
-        EditText password = (EditText) findViewById(R.id.etPassword);
-
-        // TODO New activity
-        ProfileUser profileUser = new ProfileUser(name, email, password, accountTypes.ACCOUNT_EMAIL);
-
-        if (verify(profileUser)) {
-            updateUI(true);
-        }
-        else {
-            updateUI(false);
-        }
-    }
-
-    private void facebookSignIn() {
-
-    }
-
-    private void googlePlusSignIn() {
-        Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
-        startActivityForResult(signInIntent, RC_SIGN_IN);
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
-        if (requestCode == RC_SIGN_IN) {
-            GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
-            handleSignInResult(result);
-        }
-        else {
-            callbackManager.onActivityResult(requestCode, resultCode, data);
-        }
-    }
-
-    private void handleSignInResult(GoogleSignInResult result) {
-//        if (result.isSuccess()) {
-//            // Signed in successfully, show authenticated UI.
-//            googleplusUser = result.getSignInAccount();
-//
-//            // TODO New activity
-//            profileUser = new ProfileUser(googleplusUser, accountTypes.ACCOUNT_GOOGLEPLUS);
-//
-//
-//
-//            if (verify(profileUser)) {
-//                updateUI(true);
-//            } else {
-//                // Signed out, show unauthenticated UI.
-//                updateUI(false);
-//           }
-//        } else {
-//            // Signed out, show unauthenticated UI.
-//            updateUI(false);
-//        }
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_register, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void onConnected(Bundle arg0) {
-//        // Update the UI after signin
-//        updateUI(true);
-    }
-
-    @Override
-    public void onConnectionSuspended(int arg0) {
-//        mGoogleApiClient.connect();
-//        updateUI(false);
-    }
-
-    /**
-     * Updating the UI, showing/hiding buttons and profile layout
-     */
-    private void updateUI(boolean isSignedIn) {
-        if (isSignedIn) {
-            sessionManager.clearSession();
-            sessionManager.setProfileUser(profileUser);
-
+        // Check if user is already logged in or not
+        if (sessionManager.getLogin()) {
+            // User is already logged in. Take him to main activity
             Intent intent = new Intent(RegisterActivity.this, MenuActivity.class);
             startActivity(intent);
             finish();
-        } else {
-
         }
+
+        // Validation formula
+        //registerViews();
+
+        // Button Login event click
+        btnLogin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onClickLogin();
+            }
+        });
+
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
     }
 
-    @Override
-    public void onConnectionFailed(ConnectionResult connectionResult) {
+    private void onClickLogin() {
+        String name = inputName.getText().toString().trim();
+        String email = inputEmail.getText().toString().trim();
+        String password = inputPassword.getText().toString().trim();
 
+        // Login user
+        checkLogin(name, email, accountTypes.ACCOUNT_EMAIL, password);
     }
 
-    public boolean verify(final ProfileUser profileUser) {
-        if (profileUser == null)
-            return false;
-        else
-            if (profileUser.getName() == "" || profileUser.getEmail() == "" || profileUser.getPassword() == "")
-                return false;
+    private void checkLogin(final String name, final String email, final String accountType, final String password) {
+        String tag_string_req = "req_login";
 
+        progressDialog.setMessage("Logging in...");
+        showDialog();
 
+        StringRequest strReq = new StringRequest(Request.Method.POST,
+                URL.URL_LOGIN, new Response.Listener<String>() {
 
-        String url = URL.validate;
-
-        final RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
-
-        Map<String, String> params = profileUser.buildMapToValidate(profileUser);
-
-        StringRequest request = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
-                Log.d("Response", response);
-                success = true;
+                hideDialog();
+
+                try {
+                    JSONObject jObj = new JSONObject(response);
+                    boolean error = jObj.getBoolean("error");
+
+                    // Check for error node in json
+                    if (!error) {
+                        // user successfully logged in
+                        // Create login session
+                        sessionManager.setLogin(true);
+
+                        // Launch main activity
+                        Intent intent = new Intent(RegisterActivity.this,
+                                MenuActivity.class);
+                        startActivity(intent);
+                        finish();
+                    } else {
+                        // Error in login. Get the error message
+                        String errorMsg = jObj.getString("error_msg");
+                        Snackbar.make(findViewById(R.id.layoutRegister),
+                                errorMsg, Snackbar.LENGTH_LONG).show();
+                    }
+                } catch (JSONException e) {
+                    // JSON error
+                    e.printStackTrace();
+                    Snackbar.make(findViewById(R.id.layoutRegister), "Json error: " + e.getMessage(), Snackbar.LENGTH_LONG).show();
+                }
+
             }
         }, new Response.ErrorListener() {
+
             @Override
             public void onErrorResponse(VolleyError error) {
-                Log.d("Response", error.toString());
-                Toast.makeText(getApplicationContext(), VolleyErrorHelper.getMessage(error, getApplicationContext()), Toast.LENGTH_LONG).show();
-                //Toast.makeText(getApplicationContext(), error.toString(), Toast.LENGTH_LONG).show();
-                success = false;
+                Snackbar.make(findViewById(R.id.layoutRegister),
+                        VolleyErrorHelper.getMessage(error, getApplicationContext()), Snackbar.LENGTH_LONG).show();
+                hideDialog();
             }
         }) {
 
             @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String,String> params  = new HashMap<String, String>();
-                //params.put("name", "Hippo");
-                params = profileUser.buildMapToValidate(profileUser);
+            protected Map<String, String> getParams() {
+                // Posting parameters to login url
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("email", email);
+                params.put("password", password);
 
                 return params;
             }
+
         };
 
-        requestQueue.add(request);
-
-        return success;
+        // Adding request to request queue
+        AppController.getInstance().addToRequestQueue(strReq, tag_string_req);
     }
 
+    private void registerViews() {
+        inputName.addTextChangedListener(new TextWatcher() {
+            // after every change has been made to this editText, we would like to check validity
+            public void afterTextChanged(Editable s) {
+                Validate.isEmailAddress(inputName, true);
+            }
+
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+        });
+
+        inputEmail.addTextChangedListener(new TextWatcher() {
+            // after every change has been made to this editText, we would like to check validity
+            public void afterTextChanged(Editable s) {
+                Validate.isEmailAddress(inputEmail, true);
+            }
+
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+        });
+
+        inputPassword.addTextChangedListener(new TextWatcher() {
+            // after every change has been made to this editText, we would like to check validity
+            public void afterTextChanged(Editable s) {
+                Validate.isPassword(inputPassword, true);
+            }
+
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+        });
+    }
+
+    @Override
+    protected int getLayoutResourceId() {
+        return R.layout.activity_register;
+    }
+
+    @Override
+    protected Context getContext() {
+        return getApplicationContext();
+    }
+
+    private void showDialog() {
+        if (!progressDialog.isShowing())
+            progressDialog.show();
+    }
+
+    private void hideDialog() {
+        if (progressDialog.isShowing())
+            progressDialog.dismiss();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        client.connect();
+        Action viewAction = Action.newAction(
+                Action.TYPE_VIEW, // TODO: choose an action type.
+                "Register Page", // TODO: Define a title for the content shown.
+                // TODO: If you have web page content that matches this app activity's content,
+                // make sure this auto-generated web page URL is correct.
+                // Otherwise, set the URL to null.
+                Uri.parse("http://host/path"),
+                // TODO: Make sure this auto-generated app deep link URI is correct.
+                Uri.parse("android-app://wmp.uksw.pl.pracalicencjacka_prototyp2/http/host/path")
+        );
+        AppIndex.AppIndexApi.start(client, viewAction);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        Action viewAction = Action.newAction(
+                Action.TYPE_VIEW, // TODO: choose an action type.
+                "Register Page", // TODO: Define a title for the content shown.
+                // TODO: If you have web page content that matches this app activity's content,
+                // make sure this auto-generated web page URL is correct.
+                // Otherwise, set the URL to null.
+                Uri.parse("http://host/path"),
+                // TODO: Make sure this auto-generated app deep link URI is correct.
+                Uri.parse("android-app://wmp.uksw.pl.pracalicencjacka_prototyp2/http/host/path")
+        );
+        AppIndex.AppIndexApi.end(client, viewAction);
+        client.disconnect();
+    }
 }

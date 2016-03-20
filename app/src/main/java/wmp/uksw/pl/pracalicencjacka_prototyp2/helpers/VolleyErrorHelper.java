@@ -40,6 +40,8 @@ public class VolleyErrorHelper {
 
         if (networkResponse != null) {
             switch (networkResponse.statusCode) {
+                case 500:
+                    return "Generic Error";
                 case 404:
                 case 422:
                 case 401:

@@ -5,6 +5,7 @@ package wmp.uksw.pl.pracalicencjacka_prototyp2.conf;
  */
 public class URL {
 
-    public static String validate = "http://164.132.55.196/validate";
+    public static String URL_REGISTER = "http://164.132.55.196/register";
+    public static String URL_LOGIN = "http://164.132.55.196/login";
 
 }

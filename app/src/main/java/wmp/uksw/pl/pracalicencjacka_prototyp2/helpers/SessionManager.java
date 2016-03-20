@@ -31,6 +31,7 @@ public class SessionManager {
     private final String KEY_IS_ACCOUNT_TYPE = "accountType";
     private final String KEY_IS_PROFILEUSER = "ProfileUser";
     private  final String KEY_IS_LOCATION = "Location";
+    private final String KEY_IS_LOGGED = "isLogged";
 
     public SessionManager(Context context) {
         this.context = context;
@@ -57,6 +58,11 @@ public class SessionManager {
 
     public void setAccountType(String accountType) {
         this.editor.putString(KEY_IS_ACCOUNT_TYPE, accountType);
+        this.editor.commit();
+    }
+
+    public void setLogin(boolean login) {
+        this.editor.putBoolean(KEY_IS_LOGGED, login);
         this.editor.commit();
     }
 
@@ -94,6 +100,10 @@ public class SessionManager {
         LatLng location = gson.fromJson(json, LatLng.class);
 
         return location;
+    }
+
+    public boolean getLogin() {
+        return this.sharedPreferences.getBoolean(KEY_IS_LOGGED, false);
     }
 
     public void clearSession() {

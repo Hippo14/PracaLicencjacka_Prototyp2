@@ -16,51 +16,41 @@ import wmp.uksw.pl.pracalicencjacka_prototyp2.helpers.LruBitmapCache;
 public class AppController extends Application {
 
     public static final String TAG = AppController.class.getSimpleName();
-
-    private RequestQueue requestQueue;
-    private ImageLoader imageLoader;
-
-    private static AppController instance;
+    private RequestQueue mRequestQueue;
+    private static AppController mInstance;
 
     @Override
     public void onCreate() {
         super.onCreate();
-        instance = this;
+        mInstance = this;
     }
 
     public static synchronized AppController getInstance() {
-        return instance;
+        return mInstance;
     }
 
     public RequestQueue getRequestQueue() {
-        if (requestQueue == null)
-            requestQueue = Volley.newRequestQueue(getApplicationContext());
+        if (mRequestQueue == null) {
+            mRequestQueue = Volley.newRequestQueue(getApplicationContext());
+        }
 
-        return requestQueue;
+        return mRequestQueue;
     }
 
-    public ImageLoader getImageLoader() {
-        getRequestQueue();
-
-        if (imageLoader == null)
-            imageLoader = new ImageLoader(this.requestQueue, new LruBitmapCache());
-
-        return imageLoader;
+    public <T> void addToRequestQueue(Request<T> req, String tag) {
+        req.setTag(TextUtils.isEmpty(tag) ? TAG : tag);
+        getRequestQueue().add(req);
     }
 
-    public <T> void addToRequestQueue(Request<T> request, String tag) {
-        request.setTag(TextUtils.isEmpty(tag) ? TAG : tag);
-        getRequestQueue().add(request);
+    public <T> void addToRequestQueue(Request<T> req) {
+        req.setTag(TAG);
+        getRequestQueue().add(req);
     }
 
-    public <T> void addToRequestQueue(Request<T> request) {
-        request.setTag(TAG);
-        getRequestQueue().add(request);
-    }
-
-    public void cancelPendingRequest(Object tag) {
-        if (requestQueue !=  null)
-            requestQueue.cancelAll(tag);
+    public void cancelPendingRequests(Object tag) {
+        if (mRequestQueue != null) {
+            mRequestQueue.cancelAll(tag);
+        }
     }
 
 }
