@@ -11,7 +11,7 @@ import wmp.uksw.pl.pracalicencjacka_prototyp2.service.EventService;
  */
 public class EventAlarmReceiver extends BroadcastReceiver {
     public static final int REQUEST_CODE = 1;
-    public static final String ACTION = "";
+    public static final String ACTION = "wmp.uksw.pl.pracalicencjacka_prototyp2.receiver";
 
 
     @Override

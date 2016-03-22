@@ -80,9 +80,26 @@ public class RegisterActivity extends MyActivityTemplate {
             }
         });
 
+        // Button Register event click
+        btnRegister.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onClickRegister();
+            }
+        });
+
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
+    }
+
+    private void onClickRegister() {
+        String name = inputName.getText().toString().trim();
+        String email = inputEmail.getText().toString().trim();
+        String password = inputPassword.getText().toString().trim();
+
+        // Register user
+        registerUser(name, email, accountTypes.ACCOUNT_EMAIL, password);
     }
 
     private void onClickLogin() {
@@ -92,6 +109,80 @@ public class RegisterActivity extends MyActivityTemplate {
 
         // Login user
         checkLogin(name, email, accountTypes.ACCOUNT_EMAIL, password);
+    }
+
+    private void registerUser(final String name, final String email, final String accountType, final String password) {
+        String tag_string_req = "req_register";
+
+        progressDialog.setMessage("Create user...");
+        showDialog();
+
+        StringRequest strReq = new StringRequest(Request.Method.POST,
+                URL.URL_REGISTER, new Response.Listener<String>() {
+
+            @Override
+            public void onResponse(String response) {
+                hideDialog();
+
+                try {
+                    JSONObject jObj = new JSONObject(response);
+                    boolean error = jObj.getBoolean("error");
+
+                    // Check for error node in json
+                    if (!error) {
+                        // user successfully logged in
+                        // Create login session
+                        sessionManager.setLogin(true);
+
+                        // Set user data
+                        JSONObject user = jObj.getJSONObject("user");
+                        ProfileUser profileUser = new ProfileUser(user.getString("name"), user.getString("email"), user.getString("accountType"), user.getString("password"));
+                        sessionManager.setProfileUser(profileUser);
+
+                        // Launch main activity
+                        Intent intent = new Intent(RegisterActivity.this,
+                                MenuActivity.class);
+                        startActivity(intent);
+                        finish();
+                    } else {
+                        // Error in login. Get the error message
+                        String errorMsg = jObj.getString("error_msg");
+                        Snackbar.make(findViewById(R.id.layoutRegister),
+                                errorMsg, Snackbar.LENGTH_LONG).show();
+                    }
+                } catch (JSONException e) {
+                    // JSON error
+                    e.printStackTrace();
+                    Snackbar.make(findViewById(R.id.layoutRegister), "Json error: " + e.getMessage(), Snackbar.LENGTH_LONG).show();
+                }
+
+            }
+        }, new Response.ErrorListener() {
+
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Snackbar.make(findViewById(R.id.layoutRegister),
+                        VolleyErrorHelper.getMessage(error, getApplicationContext()), Snackbar.LENGTH_LONG).show();
+                hideDialog();
+            }
+        }) {
+
+            @Override
+            protected Map<String, String> getParams() {
+                // Posting parameters to login url
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("name", name);
+                params.put("email", email);
+                params.put("accountType", accountType);
+                params.put("password", password);
+
+                return params;
+            }
+
+        };
+
+        // Adding request to request queue
+        AppController.getInstance().addToRequestQueue(strReq, tag_string_req);
     }
 
     private void checkLogin(final String name, final String email, final String accountType, final String password) {

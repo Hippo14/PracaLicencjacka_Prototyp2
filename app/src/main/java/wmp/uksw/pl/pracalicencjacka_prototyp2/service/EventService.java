@@ -1,7 +1,11 @@
 package wmp.uksw.pl.pracalicencjacka_prototyp2.service;
 
+import android.app.Activity;
 import android.app.IntentService;
 import android.content.Intent;
+import android.support.design.widget.Snackbar;
+
+import wmp.uksw.pl.pracalicencjacka_prototyp2.R;
 
 /**
  * Created by KMacioszek on 2016-03-22.
@@ -24,5 +28,6 @@ public class EventService extends IntentService {
     @Override
     protected void onHandleIntent(Intent intent) {
         // Handle event action
+        Snackbar.make( ((Activity) getApplicationContext()).findViewById(R.id.map), "Service test", Snackbar.LENGTH_LONG).show();
     }
 }

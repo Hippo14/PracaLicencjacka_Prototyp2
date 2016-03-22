@@ -38,24 +38,10 @@ public class ProfileUser {
     }
 
     public ProfileUser(String name, String email, String password, String accountType) {
-        this.name = name.getText().toString();
-        this.email = email.getText().toString();
-        this.password = password.getText().toString();
+        this.name = name;
+        this.email = email;
+        this.password = password;
         this.accountType = accountType;
-    }
-
-    public Map<String, String> buildMapToValidate(ProfileUser profileUser) {
-        Map<String, String> params = new HashMap<>();
-
-        params.put("name", profileUser.getName());
-        params.put("email", profileUser.getEmail());
-        params.put("accountType", profileUser.getAccountType());
-        if (profileUser.getPassword() == null)
-            params.put("password", "");
-        else
-            params.put("password", profileUser.getPassword());
-
-        return params;
     }
 
     public String getName() {
