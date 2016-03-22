@@ -11,6 +11,8 @@ import it.gmariotti.cardslib.library.internal.Card;
 import it.gmariotti.cardslib.library.internal.CardHeader;
 import it.gmariotti.cardslib.library.view.CardViewNative;
 import wmp.uksw.pl.pracalicencjacka_prototyp2.R;
+import wmp.uksw.pl.pracalicencjacka_prototyp2.helpers.SessionManager;
+import wmp.uksw.pl.pracalicencjacka_prototyp2.user.ProfileUser;
 
 /**
  * Created by MSI on 2016-01-14.
@@ -24,10 +26,14 @@ public class UserFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        card = new Card(getContext());
+        SessionManager sessionManager = new SessionManager(getContext());
+        ProfileUser profileUser = sessionManager.getProfileUser();
+
+        card = new Card(getContext(), R.layout.carddemo_example_inner_content);
         header = new CardHeader(getContext());
-        header.setTitle("Test");
+        header.setTitle("User");
         card.addCardHeader(header);
+        card.setTitle(profileUser.getName() + " " + profileUser.getEmail() + " " + profileUser.getAccountType() + " " + profileUser.getPassword());
     }
 
     // Inflate the view for the fragment based on layout XML

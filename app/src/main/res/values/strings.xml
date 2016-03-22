@@ -17,7 +17,8 @@
     <string name="Email">Email</string>
     <string name="Password">Password</string>
     <string name="emailRegister">Register</string>
-    <string name="EmailButton">Sign in with E-mail</string>
+    <string name="EmailButtonLogin">SIGN IN</string>
+    <string name="EmailButtonRegister">SIGN UP</string>
     <string name="title_activity_maps">Map</string>
     <string name="title_activity_search_event">SearchEventActivity</string>
 

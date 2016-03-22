@@ -5,10 +5,7 @@ import android.text.TextUtils;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
-import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.Volley;
-
-import wmp.uksw.pl.pracalicencjacka_prototyp2.helpers.LruBitmapCache;
 
 /**
  * Created by MSI on 2016-02-03.
