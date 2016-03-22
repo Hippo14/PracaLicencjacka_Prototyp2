@@ -16,6 +16,8 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.util.Calendar;
+
 import wmp.uksw.pl.pracalicencjacka_prototyp2.helpers.SessionManager;
 import wmp.uksw.pl.pracalicencjacka_prototyp2.receiver.EventAlarmReceiver;
 
@@ -43,7 +45,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         final PendingIntent pendingIntent = PendingIntent.getBroadcast(this, EventAlarmReceiver.REQUEST_CODE, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         long firstMilis = System.currentTimeMillis();
         AlarmManager alarmManager = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
-        alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, firstMilis, AlarmManager.INTERVAL_FIFTEEN_MINUTES, pendingIntent);
+        //alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, firstMilis, AlarmManager.INTERVAL_FIFTEEN_MINUTES, pendingIntent);
+
+        Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.SECOND, 30);
+
+        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), 60* 1000, pendingIntent);
     }
 
     public void cancelAlarm() {
