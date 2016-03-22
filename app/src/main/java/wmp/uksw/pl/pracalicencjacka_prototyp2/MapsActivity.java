@@ -4,6 +4,7 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.os.SystemClock;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -24,10 +25,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private GoogleMap mMap;
     private SessionManager sessionManager;
 
+    private static final int _REFRESH_INTERVAL = 60 * 1;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+        Log.d("EventService", "onCreate()");
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -35,7 +39,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         sessionManager = new SessionManager(getApplicationContext());
 
-        scheduleAlarm();
+        //scheduleAlarm();
     }
 
     private void scheduleAlarm() {
@@ -43,7 +47,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         final PendingIntent pendingIntent = PendingIntent.getBroadcast(this, EventAlarmReceiver.REQUEST_CODE, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         long firstMilis = System.currentTimeMillis();
         AlarmManager alarmManager = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
-        alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, firstMilis, AlarmManager.INTERVAL_FIFTEEN_MINUTES, pendingIntent);
+        //alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, firstMilis, AlarmManager.INTERVAL_FIFTEEN_MINUTES, pendingIntent);
+        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, SystemClock.elapsedRealtime(), 1000 * _REFRESH_INTERVAL, pendingIntent);
     }
 
     public void cancelAlarm() {
@@ -93,6 +98,44 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 Log.d("Camera", "(" + latLng.latitude + " ," + latLng.longitude + ")");
             }
         });
+    }
+
+    @Override
+    public void onBackPressed() {
+        Log.d("EventService", "onBackPressed()");
+
+        Intent intent = new Intent(getApplicationContext(), MenuActivity.class);
+        cancelAlarm();
+        startActivity(intent);
+        finish();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        Log.d("EventService", "onPause()");
+        //cancelAlarm();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        Log.d("EventService", "onStop()");
+        cancelAlarm();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.d("EventService", "onResume()");
+        //scheduleAlarm();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        Log.d("EventService", "onStart()");
+        scheduleAlarm();
     }
 
 }

@@ -2,6 +2,7 @@ package wmp.uksw.pl.pracalicencjacka_prototyp2.service;
 
 import android.app.IntentService;
 import android.content.Intent;
+import android.util.Log;
 
 /**
  * Created by KMacioszek on 2016-03-22.
@@ -24,5 +25,6 @@ public class EventService extends IntentService {
     @Override
     protected void onHandleIntent(Intent intent) {
         // Handle event action
+        Log.d("EventService", "Service working");
     }
 }

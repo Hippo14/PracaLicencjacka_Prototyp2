@@ -46,6 +46,7 @@ public class EventsFragment extends Fragment {
 
                 Intent intent = new Intent(getContext(), EventAddActivity.class);
                 startActivity(intent);
+                //getActivity().finish();
 
 //                Snackbar.make(view.findViewById(R.id.frameLayout), "Click on row to know more details", Snackbar.LENGTH_LONG)
 //                        .setAction("OK", new View.OnClickListener() {
