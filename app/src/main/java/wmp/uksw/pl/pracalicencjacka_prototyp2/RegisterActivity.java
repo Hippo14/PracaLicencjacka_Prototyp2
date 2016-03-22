@@ -211,6 +211,11 @@ public class RegisterActivity extends MyActivityTemplate {
                         // Create login session
                         sessionManager.setLogin(true);
 
+                        // Set user data
+                        JSONObject user = jObj.getJSONObject("user");
+                        ProfileUser profileUser = new ProfileUser(user.getString("name"), user.getString("email"), user.getString("accountType"), user.getString("password"));
+                        sessionManager.setProfileUser(profileUser);
+
                         // Launch main activity
                         Intent intent = new Intent(RegisterActivity.this,
                                 MenuActivity.class);
