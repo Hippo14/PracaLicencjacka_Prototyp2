@@ -37,7 +37,7 @@ public class ProfileUser {
         this.accountType = accountType;
     }
 
-    public ProfileUser(TextView name, TextView email, TextView password, String accountType) {
+    public ProfileUser(String name, String email, String password, String accountType) {
         this.name = name.getText().toString();
         this.email = email.getText().toString();
         this.password = password.getText().toString();

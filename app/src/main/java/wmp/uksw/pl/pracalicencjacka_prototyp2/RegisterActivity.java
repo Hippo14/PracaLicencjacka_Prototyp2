@@ -30,6 +30,7 @@ import wmp.uksw.pl.pracalicencjacka_prototyp2.constants.accountTypes;
 import wmp.uksw.pl.pracalicencjacka_prototyp2.helpers.Validate;
 import wmp.uksw.pl.pracalicencjacka_prototyp2.helpers.VolleyErrorHelper;
 import wmp.uksw.pl.pracalicencjacka_prototyp2.template.MyActivityTemplate;
+import wmp.uksw.pl.pracalicencjacka_prototyp2.user.ProfileUser;
 
 public class RegisterActivity extends MyActivityTemplate {
 
@@ -115,6 +116,11 @@ public class RegisterActivity extends MyActivityTemplate {
                         // user successfully logged in
                         // Create login session
                         sessionManager.setLogin(true);
+
+                        // Set user data
+                        JSONObject user = jObj.getJSONObject("user");
+                        ProfileUser profileUser = new ProfileUser(user.getString("name"), user.getString("email"), user.getString("accountType"), user.getString("password"));
+                        sessionManager.setProfileUser(profileUser);
 
                         // Launch main activity
                         Intent intent = new Intent(RegisterActivity.this,

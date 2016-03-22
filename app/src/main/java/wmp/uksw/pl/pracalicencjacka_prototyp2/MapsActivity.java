@@ -1,5 +1,9 @@
 package wmp.uksw.pl.pracalicencjacka_prototyp2;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -13,6 +17,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import wmp.uksw.pl.pracalicencjacka_prototyp2.helpers.SessionManager;
+import wmp.uksw.pl.pracalicencjacka_prototyp2.receiver.EventAlarmReceiver;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
@@ -29,8 +34,24 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mapFragment.getMapAsync(this);
 
         sessionManager = new SessionManager(getApplicationContext());
+
+        scheduleAlarm();
     }
 
+    private void scheduleAlarm() {
+        Intent intent = new Intent(getApplicationContext(), EventAlarmReceiver.class);
+        final PendingIntent pendingIntent = PendingIntent.getBroadcast(this, EventAlarmReceiver.REQUEST_CODE, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        long firstMilis = System.currentTimeMillis();
+        AlarmManager alarmManager = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
+        alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, firstMilis, AlarmManager.INTERVAL_FIFTEEN_MINUTES, pendingIntent);
+    }
+
+    public void cancelAlarm() {
+        Intent intent = new Intent(getApplicationContext(), EventAlarmReceiver.class);
+        final PendingIntent pendingIntent = PendingIntent.getBroadcast(this, EventAlarmReceiver.REQUEST_CODE, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        AlarmManager alarmManager = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
+        alarmManager.cancel(pendingIntent);
+    }
 
     /**
      * Manipulates the map once available.
