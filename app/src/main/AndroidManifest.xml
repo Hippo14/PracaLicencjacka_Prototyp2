@@ -60,7 +60,8 @@
             android:label="@string/title_activity_maps"></activity>
         <activity
             android:name=".EventAddActivity"
-            android:label="@string/title_activity_event_add"></activity>
+            android:label="@string/title_activity_event_add"
+            android:windowSoftInputMode="adjustResize"></activity>
     </application>
 
 </manifest>
