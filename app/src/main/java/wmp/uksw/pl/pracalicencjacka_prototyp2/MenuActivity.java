@@ -8,9 +8,12 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.RelativeLayout;
+
+import com.google.android.gms.maps.MapView;
 
 import wmp.uksw.pl.pracalicencjacka_prototyp2.fragments.BoardFragment;
 import wmp.uksw.pl.pracalicencjacka_prototyp2.fragments.EventsFragment;
@@ -29,6 +32,22 @@ public class MenuActivity extends MyActivityTemplate {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Log.d("MapView", "Start init mapView");
+                    MapView mapView = new MapView(getApplicationContext());
+                    mapView.onCreate(null);
+                    mapView.onPause();
+                    mapView.onDestroy();
+                    Log.d("MapView", "...done");
+                } catch (Exception ignored) {
+                    ignored.printStackTrace();
+                }
+            }
+        }).start();
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_layout);
         tabLayout.addTab(tabLayout.newTab().setIcon(R.mipmap.ic_board));
