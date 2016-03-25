@@ -71,6 +71,11 @@ public class EventAddActivity extends FragmentActivity implements OnMapReadyCall
         mapFragment.getMapAsync(this);
     }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finish();
+    }
 
     /**
      * Manipulates the map once available.
@@ -85,7 +90,7 @@ public class EventAddActivity extends FragmentActivity implements OnMapReadyCall
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         marker = null;
-        progressDialog = new ProgressDialog(getApplicationContext());
+        progressDialog = new ProgressDialog(EventAddActivity.this);
 
         btnAddEvent = (Button) findViewById(R.id.btnAddEvent);
 
@@ -143,8 +148,6 @@ public class EventAddActivity extends FragmentActivity implements OnMapReadyCall
                 });
             }
         });
-
-
     }
 
     private void addEvent(final String name, final String description, final Double latitude, final Double longitude) {
@@ -171,10 +174,15 @@ public class EventAddActivity extends FragmentActivity implements OnMapReadyCall
                         //TODO ADD EVENT ????
 
                         // Launch main activity
-                        Intent intent = new Intent(EventAddActivity.this,
-                                MenuActivity.class);
-                        startActivity(intent);
-                        finish();
+//                        Intent intent = new Intent(EventAddActivity.this,
+//                                MenuActivity.class);
+//                        startActivity(intent);
+//                        finish();
+
+                        onBackPressed();
+
+
+                        //Snackbar.make(findViewById(R.id.relativeLayoutMenu), "Event added!", Snackbar.LENGTH_LONG).show();
                     } else {
                         // Error in login. Get the error message
                         String errorMsg = jObj.getString("error_msg");
