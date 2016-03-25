@@ -43,6 +43,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     private void scheduleAlarm() {
+        sessionManager.setLatLng(mMap.getCameraPosition().target);
+        final MarkerOptions options = new MarkerOptions();
+        options.position(mMap.getCameraPosition().target);
+        options.title("ITS ME!");
+        mMap.addMarker(options);
+
         Intent intent = new Intent(getApplicationContext(), EventAlarmReceiver.class);
         final PendingIntent pendingIntent = PendingIntent.getBroadcast(this, EventAlarmReceiver.REQUEST_CODE, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         long firstMilis = System.currentTimeMillis();
