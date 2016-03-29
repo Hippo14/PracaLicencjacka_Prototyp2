@@ -4,20 +4,42 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Looper;
 import android.os.SystemClock;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.logging.Handler;
+
+import wmp.uksw.pl.pracalicencjacka_prototyp2.conf.URL;
 import wmp.uksw.pl.pracalicencjacka_prototyp2.helpers.SessionManager;
+import wmp.uksw.pl.pracalicencjacka_prototyp2.helpers.VolleyErrorHelper;
 import wmp.uksw.pl.pracalicencjacka_prototyp2.receiver.EventAlarmReceiver;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
@@ -25,7 +47,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private GoogleMap mMap;
     private SessionManager sessionManager;
 
+    private ScheduledThreadPoolExecutor scheduler = null;
+
     private static final int _REFRESH_INTERVAL = 60 * 1;
+    private boolean isRunning = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,25 +68,65 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     private void scheduleAlarm() {
-        sessionManager.setLatLng(mMap.getCameraPosition().target);
-        final MarkerOptions options = new MarkerOptions();
-        options.position(mMap.getCameraPosition().target);
-        options.title("ITS ME!");
-        mMap.addMarker(options);
+//        sessionManager.setLatLng(mMap.getCameraPosition().target);
+//        final MarkerOptions options = new MarkerOptions();
+//        options.position(mMap.getCameraPosition().target);
+//        options.title("ITS ME!");
+//        mMap.addMarker(options);
 
-        Intent intent = new Intent(getApplicationContext(), EventAlarmReceiver.class);
-        final PendingIntent pendingIntent = PendingIntent.getBroadcast(this, EventAlarmReceiver.REQUEST_CODE, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-        long firstMilis = System.currentTimeMillis();
-        AlarmManager alarmManager = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
-        //alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, firstMilis, AlarmManager.INTERVAL_FIFTEEN_MINUTES, pendingIntent);
-        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, SystemClock.elapsedRealtime(), 1000 * _REFRESH_INTERVAL, pendingIntent);
+        Log.d("EventService", "Start Task");
+        isRunning = true;
+
+        scheduler = (ScheduledThreadPoolExecutor) Executors.newScheduledThreadPool(2);
+
+        scheduler.scheduleWithFixedDelay(new Runnable() {
+            @Override
+            public void run() {
+                // Get location
+                LatLng location = sessionManager.getLatLnt();
+                // Add marker
+                final MarkerOptions options = new MarkerOptions();
+                options.position(location);
+                options.title("ITS ME!");
+                android.os.Handler handler1 = new android.os.Handler(Looper.getMainLooper());
+                handler1.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        mMap.addMarker(options).showInfoWindow();
+                    }
+                });
+                // Handle event action
+                getEvents(location.latitude, location.longitude);
+            }
+        }, 10, 5, TimeUnit.SECONDS);
+
+
+//        Intent intent = new Intent(getApplicationContext(), EventAlarmReceiver.class);
+//        final PendingIntent pendingIntent = PendingIntent.getBroadcast(this, EventAlarmReceiver.REQUEST_CODE, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+//        long firstMilis = System.currentTimeMillis();
+//        AlarmManager alarmManager = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
+//        //alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, firstMilis, AlarmManager.INTERVAL_FIFTEEN_MINUTES, pendingIntent);
+//        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, SystemClock.elapsedRealtime(), 1000 * _REFRESH_INTERVAL, pendingIntent);
     }
 
     public void cancelAlarm() {
-        Intent intent = new Intent(getApplicationContext(), EventAlarmReceiver.class);
-        final PendingIntent pendingIntent = PendingIntent.getBroadcast(this, EventAlarmReceiver.REQUEST_CODE, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-        AlarmManager alarmManager = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
-        alarmManager.cancel(pendingIntent);
+        isRunning = false;
+
+        if (scheduler != null) {
+            scheduler.shutdown();
+            try {
+                scheduler.awaitTermination(2, TimeUnit.SECONDS);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            Log.d("EventService", "Shutdown Task");
+        }
+
+
+//        Intent intent = new Intent(getApplicationContext(), EventAlarmReceiver.class);
+//        final PendingIntent pendingIntent = PendingIntent.getBroadcast(this, EventAlarmReceiver.REQUEST_CODE, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+//        AlarmManager alarmManager = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
+//        alarmManager.cancel(pendingIntent);
     }
 
     /**
@@ -79,29 +144,40 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         LatLng location = sessionManager.getLatLnt();
 
-        if (location == null) {
-            // Add a marker in Sydney and move the camera
-            location = new LatLng(-34, 151);
-            mMap.addMarker(new MarkerOptions().position(location).title("Marker in Sydney"));
-            mMap.moveCamera(CameraUpdateFactory.newLatLng(location));
-        }
-        else {
-            mMap.addMarker(new MarkerOptions().position(location).title("Marker Bitches!"));
-            mMap.moveCamera(CameraUpdateFactory.newLatLng(location));
-        }
+        if (!isRunning)
+            scheduleAlarm();
+
+//        if (location == null) {
+//            // Add a marker in Sydney and move the camera
+//            location = new LatLng(-34, 151);
+//            mMap.addMarker(new MarkerOptions().position(location).title("Marker in Sydney"));
+//            mMap.moveCamera(CameraUpdateFactory.newLatLng(location));
+//        }
+//        else {
+//            mMap.addMarker(new MarkerOptions().position(location).title("Marker Bitches!"));
+//            mMap.moveCamera(CameraUpdateFactory.newLatLng(location));
+//        }
 
         mMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
             @Override
             public void onMapLoaded() {
+                mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+                    @Override
+                    public void onMapClick(LatLng latLng) {
+                        // Set camera to temporary marker
+                        CameraUpdate center = CameraUpdateFactory.newLatLngZoom(latLng, mMap.getCameraPosition().zoom);
+                        mMap.animateCamera(center);
+                        sessionManager.setLatLng(latLng);
+                    }
+                });
 
-            }
-        });
-
-        mMap.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
-            @Override
-            public void onCameraChange(CameraPosition cameraPosition) {
-                LatLng latLng = cameraPosition.target;
-                Log.d("Camera", "(" + latLng.latitude + " ," + latLng.longitude + ")");
+                mMap.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
+                    @Override
+                    public void onCameraChange(CameraPosition cameraPosition) {
+                        LatLng latLng = cameraPosition.target;
+                        Log.d("Camera", "(" + latLng.latitude + " ," + latLng.longitude + ")");
+                    }
+                });
             }
         });
     }
@@ -134,14 +210,76 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onResume() {
         super.onResume();
         Log.d("EventService", "onResume()");
-        //scheduleAlarm();
+        if (!isRunning)
+            scheduleAlarm();
     }
 
     @Override
     public void onStart() {
         super.onStart();
         Log.d("EventService", "onStart()");
-        scheduleAlarm();
+        if (!isRunning)
+            scheduleAlarm();
+    }
+
+    private void getEvents(final double latitude, final double longitude) {
+        String tag_string_req = "req_getEvents";
+
+        Log.d("EventService", "Start getting events");
+
+        StringRequest strReq = new StringRequest(Request.Method.POST,
+                URL.URL_GET_EVENT, new Response.Listener<String>() {
+
+            @Override
+            public void onResponse(String response) {
+                try {
+                    JSONObject jObj = new JSONObject(response);
+                    boolean error = jObj.getBoolean("error");
+
+                    // Check for error node in json
+                    if (!error) {
+
+                    } else {
+                        // Error in login. Get the error message
+                        String errorMsg = jObj.getString("error_msg");
+                        Snackbar.make(findViewById(R.id.relativeLayoutMap),
+                                errorMsg, Snackbar.LENGTH_LONG).show();
+                        //Toast.makeText(getApplicationContext(), errorMsg, Toast.LENGTH_LONG).show();
+                    }
+                } catch (JSONException e) {
+                    // JSON error
+                    e.printStackTrace();
+                    Snackbar.make(findViewById(R.id.relativeLayoutMap), "Json error: " + e.getMessage(), Snackbar.LENGTH_LONG).show();
+//                    Toast.makeText(getApplicationContext(), "Json error: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                }
+
+            }
+        }, new Response.ErrorListener() {
+
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Snackbar.make(findViewById(R.id.relativeLayoutMap),
+                        VolleyErrorHelper.getMessage(error, getApplicationContext()), Snackbar.LENGTH_LONG).show();
+//                Toast.makeText(getApplicationContext(), VolleyErrorHelper.getMessage(error, getApplicationContext()), Toast.LENGTH_LONG).show();
+            }
+        }) {
+
+            @Override
+            protected Map<String, String> getParams() {
+                // Posting parameters to login url
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("latitude", Double.toString(latitude));
+                params.put("longitude", Double.toString(longitude));
+
+                return params;
+            }
+
+        };
+
+        Log.d("EventService", "End getting events");
+
+        // Adding request to request queue
+        AppController.getInstance().addToRequestQueue(strReq, tag_string_req);
     }
 
 }

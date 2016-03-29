@@ -55,6 +55,7 @@ public class VolleyErrorHelper {
                             return result.get("error");
                     } catch (Exception e) {
                         e.printStackTrace();
+                        return "Generic error";
                     }
                     //Invalid request
                     return ((VolleyError) error).getMessage();

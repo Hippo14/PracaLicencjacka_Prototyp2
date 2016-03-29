@@ -4,6 +4,7 @@ import android.app.IntentService;
 import android.content.Intent;
 import android.support.design.widget.Snackbar;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -74,11 +75,13 @@ public class EventService extends IntentService {
                         String errorMsg = jObj.getString("error_msg");
 //                        Snackbar.make(findViewById(R.id.layoutRegister),
 //                                errorMsg, Snackbar.LENGTH_LONG).show();
+                        Toast.makeText(getApplicationContext(), errorMsg, Toast.LENGTH_LONG).show();
                     }
                 } catch (JSONException e) {
                     // JSON error
                     e.printStackTrace();
 //                    Snackbar.make(findViewById(R.id.layoutRegister), "Json error: " + e.getMessage(), Snackbar.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), "Json error: " + e.getMessage(), Toast.LENGTH_LONG).show();
                 }
 
             }
@@ -88,6 +91,7 @@ public class EventService extends IntentService {
             public void onErrorResponse(VolleyError error) {
 //                Snackbar.make(findViewById(R.id.layoutRegister),
 //                        VolleyErrorHelper.getMessage(error, getApplicationContext()), Snackbar.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), VolleyErrorHelper.getMessage(error, getApplicationContext()), Toast.LENGTH_LONG).show();
             }
         }) {
 
