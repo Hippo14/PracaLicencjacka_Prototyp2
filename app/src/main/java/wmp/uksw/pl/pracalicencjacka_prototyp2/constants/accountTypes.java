@@ -7,6 +7,6 @@ public class accountTypes {
 
     public static final String ACCOUNT_GOOGLEPLUS = "googlePlus";
     public static final String ACCOUNT_FACEBOOK = "facebook";
-    public static final String ACCOUNT_EMAIL = "email";
+    public static final String ACCOUNT_EMAIL = "1";
 
 }

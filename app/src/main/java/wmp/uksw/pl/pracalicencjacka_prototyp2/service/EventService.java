@@ -2,7 +2,6 @@ package wmp.uksw.pl.pracalicencjacka_prototyp2.service;
 
 import android.app.IntentService;
 import android.content.Intent;
-import android.support.design.widget.Snackbar;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -19,12 +18,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import wmp.uksw.pl.pracalicencjacka_prototyp2.AppController;
-import wmp.uksw.pl.pracalicencjacka_prototyp2.MenuActivity;
-import wmp.uksw.pl.pracalicencjacka_prototyp2.R;
 import wmp.uksw.pl.pracalicencjacka_prototyp2.conf.URL;
 import wmp.uksw.pl.pracalicencjacka_prototyp2.helpers.SessionManager;
 import wmp.uksw.pl.pracalicencjacka_prototyp2.helpers.VolleyErrorHelper;
-import wmp.uksw.pl.pracalicencjacka_prototyp2.user.ProfileUser;
 
 /**
  * Created by KMacioszek on 2016-03-22.
@@ -59,7 +55,7 @@ public class EventService extends IntentService {
         String tag_string_req = "req_getEvents";
 
         StringRequest strReq = new StringRequest(Request.Method.POST,
-                URL.URL_GET_EVENT, new Response.Listener<String>() {
+                URL.URL_GET_EVENTS, new Response.Listener<String>() {
 
             @Override
             public void onResponse(String response) {

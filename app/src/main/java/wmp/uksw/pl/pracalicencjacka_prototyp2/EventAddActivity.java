@@ -210,6 +210,7 @@ public class EventAddActivity extends FragmentActivity implements OnMapReadyCall
             protected Map<String, String> getParams() {
                 // Posting parameters to login url
                 Map<String, String> params = new HashMap<String, String>();
+                params.put("email", sessionManager.getProfileUser().getEmail());
                 params.put("name", name);
                 params.put("description", description);
                 params.put("latitude", latitude.toString());

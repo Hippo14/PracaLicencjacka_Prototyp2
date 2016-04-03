@@ -1,16 +1,11 @@
 package wmp.uksw.pl.pracalicencjacka_prototyp2;
 
-import android.app.AlarmManager;
-import android.app.PendingIntent;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Looper;
-import android.os.SystemClock;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -26,21 +21,22 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Vector;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Handler;
 
 import wmp.uksw.pl.pracalicencjacka_prototyp2.conf.URL;
 import wmp.uksw.pl.pracalicencjacka_prototyp2.helpers.SessionManager;
 import wmp.uksw.pl.pracalicencjacka_prototyp2.helpers.VolleyErrorHelper;
-import wmp.uksw.pl.pracalicencjacka_prototyp2.receiver.EventAlarmReceiver;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
@@ -51,6 +47,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private static final int _REFRESH_INTERVAL = 60 * 1;
     private boolean isRunning = false;
+
+    private List<Marker> markerList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,6 +61,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mapFragment.getMapAsync(this);
 
         sessionManager = new SessionManager(getApplicationContext());
+        markerList = new ArrayList<>();
 
         //scheduleAlarm();
     }
@@ -84,21 +83,22 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             public void run() {
                 // Get location
                 LatLng location = sessionManager.getLatLnt();
-                // Add marker
-                final MarkerOptions options = new MarkerOptions();
-                options.position(location);
-                options.title("ITS ME!");
-                android.os.Handler handler1 = new android.os.Handler(Looper.getMainLooper());
-                handler1.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        mMap.addMarker(options).showInfoWindow();
-                    }
-                });
+//                // Add marker
+//                final MarkerOptions options = new MarkerOptions();
+//                options.position(location);
+//                options.title("ITS ME!");
+//                android.os.Handler handler1 = new android.os.Handler(Looper.getMainLooper());
+//                handler1.post(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        mMap.addMarker(options).showInfoWindow();
+//                    }
+//                });
+
                 // Handle event action
                 getEvents(location.latitude, location.longitude);
             }
-        }, 10, 5, TimeUnit.SECONDS);
+        }, 1, 15, TimeUnit.SECONDS);
 
 
 //        Intent intent = new Intent(getApplicationContext(), EventAlarmReceiver.class);
@@ -141,11 +141,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        mMap.getUiSettings().setZoomControlsEnabled(false);
 
-        LatLng location = sessionManager.getLatLnt();
+        final LatLng location = sessionManager.getLatLnt();
 
-        if (!isRunning)
-            scheduleAlarm();
+        CameraUpdate center = CameraUpdateFactory.newLatLngZoom(location, 12.0f);
+        mMap.animateCamera(center);
 
 //        if (location == null) {
 //            // Add a marker in Sydney and move the camera
@@ -161,10 +162,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
             @Override
             public void onMapLoaded() {
+                if (!isRunning)
+                    scheduleAlarm();
+
+                sessionManager.setLatLng(location);
+
                 mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
                     @Override
                     public void onMapClick(LatLng latLng) {
-                        // Set camera to temporary marker
                         CameraUpdate center = CameraUpdateFactory.newLatLngZoom(latLng, mMap.getCameraPosition().zoom);
                         mMap.animateCamera(center);
                         sessionManager.setLatLng(latLng);
@@ -174,6 +179,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 mMap.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
                     @Override
                     public void onCameraChange(CameraPosition cameraPosition) {
+                        sessionManager.setLatLng(cameraPosition.target);
                         LatLng latLng = cameraPosition.target;
                         Log.d("Camera", "(" + latLng.latitude + " ," + latLng.longitude + ")");
                     }
@@ -228,7 +234,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         Log.d("EventService", "Start getting events");
 
         StringRequest strReq = new StringRequest(Request.Method.POST,
-                URL.URL_GET_EVENT, new Response.Listener<String>() {
+                URL.URL_GET_EVENTS, new Response.Listener<String>() {
 
             @Override
             public void onResponse(String response) {
@@ -238,7 +244,23 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                     // Check for error node in json
                     if (!error) {
+                        Log.d("EventService", "Success...");
 
+                        // Set marker list
+                        JSONArray events = jObj.getJSONArray("events");
+
+                        Log.d("EventService", "Clear map...");
+                        mMap.clear();
+
+                        Log.d("EventService", "Setting marker list...");
+                        for(int i = 0; i < events.length(); i++) {
+                            MarkerOptions options = new MarkerOptions();
+                            options.title(events.getJSONObject(i).getString("name"));
+                            options.position(new LatLng(events.getJSONObject(i).getDouble("latitude"), events.getJSONObject(i).getDouble("longitude")));
+
+                            Marker marker = mMap.addMarker(options);
+                            markerList.add(marker);
+                        }
                     } else {
                         // Error in login. Get the error message
                         String errorMsg = jObj.getString("error_msg");
@@ -273,7 +295,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                 return params;
             }
-
         };
 
         Log.d("EventService", "End getting events");
