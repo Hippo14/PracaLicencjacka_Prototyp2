@@ -17,7 +17,14 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.google.android.gms.maps.model.LatLng;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -31,6 +38,8 @@ public class SearchEventActivity extends MyActivityTemplate {
     private ListView listView;
     private SearchAdapter searchAdapter;
     private List<Address> list;
+    private LatLng stateLocation;
+    JSONObject location;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,13 +51,22 @@ public class SearchEventActivity extends MyActivityTemplate {
         View.OnClickListener onClickListener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Getting EditText
-                EditText etLocation = (EditText) findViewById(R.id.etSearch);
-                // Getting string
-                String location = etLocation.getText().toString();
+//                // Getting EditText
+//                EditText etLocation = (EditText) findViewById(R.id.etSearch);
+//                // Getting string
+//                String location = etLocation.getText().toString();
+//
+//                if (location != null && !location.equals(""))
+//                    new GeoCoderTask().execute(location);
 
-                if (location != null && !location.equals(""))
-                    new GeoCoderTask().execute(location);
+                // Save searched location as (x, y)
+                LatLng location = new LatLng(Double.parseDouble("52.2296756"), Double.parseDouble("21.0122287"));
+                sessionManager.setLatLng(location);
+
+                // Intent to GoogleMaps Activity
+                Intent intent = new Intent(getContext(), MapsActivity.class);
+                startActivity(intent);
+                finish();
             }
         };
 
@@ -114,6 +132,38 @@ public class SearchEventActivity extends MyActivityTemplate {
             Geocoder geocoder = new Geocoder(getBaseContext());
             List<Address> addresses = new ArrayList<>();
 
+//            String tag_string_req = "req_getLocation";
+//
+//
+//            String UrlCity = "http://maps.googleapis.com/maps/api/geocode/json?address=" + params[0] + "&sensor=false";
+//
+//            JsonObjectRequest stateReq = new JsonObjectRequest(Request.Method.GET, UrlCity, null, new Response.Listener<JSONObject>() {
+//                @Override
+//                public void onResponse(JSONObject response) {
+//
+//                    try {
+//                        // Get JSON Array called "results" and then get the 0th
+//                        // complete object as JSON
+//                        location = response.getJSONArray("results").getJSONObject(0).getJSONObject("geometry").getJSONObject("location");
+//                        // Get the value of the attribute whose name is
+//                        // "formatted_string"
+//                        stateLocation = new LatLng(location.getDouble("lat"), location.getDouble("lng"));
+//                    } catch (JSONException e1) {
+//                        e1.printStackTrace();
+//
+//                    }
+//                }
+//
+//            }, new Response.ErrorListener() {
+//                @Override
+//                public void onErrorResponse(VolleyError error) {
+//                    Log.d("Error.Response", error.toString());
+//                }
+//            });
+//            // add it to the RequestQueue
+//            // Adding request to request queue
+//            AppController.getInstance().addToRequestQueue(stateReq, tag_string_req);
+
             try {
                 addresses = geocoder.getFromLocationName(params[0], 1);
             } catch (IOException e) {
@@ -138,4 +188,6 @@ public class SearchEventActivity extends MyActivityTemplate {
             listView.setAdapter(searchAdapter);
         }
     }
+
+
 }

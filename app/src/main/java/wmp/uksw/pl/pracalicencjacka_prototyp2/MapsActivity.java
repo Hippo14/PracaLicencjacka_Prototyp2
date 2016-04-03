@@ -6,6 +6,8 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.TextView;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -49,6 +51,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private boolean isRunning = false;
 
     private List<Marker> markerList;
+    private String markerDetailsTitle;
+    private String markerDetailsUsername;
+    private String markerDetailsDescription;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -142,11 +147,51 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         mMap.getUiSettings().setZoomControlsEnabled(false);
+        mMap.getUiSettings().setMapToolbarEnabled(false);
 
         final LatLng location = sessionManager.getLatLnt();
 
+
         CameraUpdate center = CameraUpdateFactory.newLatLngZoom(location, 12.0f);
         mMap.animateCamera(center);
+
+        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker) {
+                getMarkerDetails(marker.getTitle(), marker.getPosition().latitude, marker.getPosition().longitude);
+
+                return false;
+            }
+        });
+
+
+        mMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
+            @Override
+            // Use default InfoWindow frame
+            public View getInfoWindow(Marker marker) {
+                return null;
+            }
+
+            // Defines the contents of the InfoWindow
+            @Override
+            public View getInfoContents(Marker marker) {
+                //Getting view from the layout file
+                View v = getLayoutInflater().inflate(R.layout.marker_layout, null);
+                // Getting the position from the marker
+                LatLng latLng = marker.getPosition();
+
+                // Getting the reference to the TextView to set latitude
+                TextView markerTitle = (TextView) v.findViewById(R.id.markerTitle);
+                TextView markerUsername = (TextView) v.findViewById(R.id.markerUsername);
+                TextView markerDescription = (TextView) v.findViewById(R.id.markerDescription);
+
+                markerTitle.setText(markerDetailsTitle);
+                markerUsername.setText(markerDetailsUsername);
+                markerDescription.setText(markerDetailsDescription);
+
+                return v;
+            }
+        });
 
 //        if (location == null) {
 //            // Add a marker in Sydney and move the camera
@@ -290,6 +335,70 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             protected Map<String, String> getParams() {
                 // Posting parameters to login url
                 Map<String, String> params = new HashMap<String, String>();
+                params.put("latitude", Double.toString(latitude));
+                params.put("longitude", Double.toString(longitude));
+
+                return params;
+            }
+        };
+
+        Log.d("EventService", "End getting events");
+
+        // Adding request to request queue
+        AppController.getInstance().addToRequestQueue(strReq, tag_string_req);
+    }
+
+    private void getMarkerDetails(final String name, final Double latitude, final Double longitude) {
+        String tag_string_req = "req_getMarkerDetails";
+
+        StringRequest strReq = new StringRequest(Request.Method.POST,
+                URL.URL_GET_MARKERDETAILS, new Response.Listener<String>() {
+
+            @Override
+            public void onResponse(String response) {
+                try {
+                    JSONObject jObj = new JSONObject(response);
+                    boolean error = jObj.getBoolean("error");
+
+                    // Check for error node in json
+                    if (!error) {
+                        JSONObject markerDetails = jObj.getJSONObject("marker");
+
+                        // Set marker details
+                        markerDetailsTitle = markerDetails.getString("title");
+                        markerDetailsUsername = markerDetails.getString("username");
+                        markerDetailsDescription = markerDetails.getString("description");
+
+                    } else {
+                        // Error in login. Get the error message
+                        String errorMsg = jObj.getString("error_msg");
+                        Snackbar.make(findViewById(R.id.relativeLayoutMap),
+                                errorMsg, Snackbar.LENGTH_LONG).show();
+                        //Toast.makeText(getApplicationContext(), errorMsg, Toast.LENGTH_LONG).show();
+                    }
+                } catch (JSONException e) {
+                    // JSON error
+                    e.printStackTrace();
+                    Snackbar.make(findViewById(R.id.relativeLayoutMap), "Json error: " + e.getMessage(), Snackbar.LENGTH_LONG).show();
+//                    Toast.makeText(getApplicationContext(), "Json error: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                }
+
+            }
+        }, new Response.ErrorListener() {
+
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Snackbar.make(findViewById(R.id.relativeLayoutMap),
+                        VolleyErrorHelper.getMessage(error, getApplicationContext()), Snackbar.LENGTH_LONG).show();
+//                Toast.makeText(getApplicationContext(), VolleyErrorHelper.getMessage(error, getApplicationContext()), Toast.LENGTH_LONG).show();
+            }
+        }) {
+
+            @Override
+            protected Map<String, String> getParams() {
+                // Posting parameters to login url
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("name", name);
                 params.put("latitude", Double.toString(latitude));
                 params.put("longitude", Double.toString(longitude));
 
