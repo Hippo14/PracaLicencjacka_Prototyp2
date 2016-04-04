@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.List;
@@ -29,9 +30,11 @@ public class EventAdapter extends ArrayAdapter<EventRow> {
         if (convertView == null)
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.event_adapter, parent, false);
 
+        ImageView eventImage = (ImageView) convertView.findViewById(R.id.item_imageView);
         TextView eventName = (TextView) convertView.findViewById(R.id.eventName);
         TextView eventDescription = (TextView) convertView.findViewById(R.id.eventDescription);
 
+        eventImage.setImageResource(eventRow.imageID);
         eventName.setText(eventRow.name);
         eventDescription.setText(eventRow.description);
 

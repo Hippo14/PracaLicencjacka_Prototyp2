@@ -387,10 +387,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     private void getMarkerDetails(final String name, final Double latitude, final Double longitude, final VolleyCallback callback) {
-        progressDialog.setTitle("Please wait");
-        progressDialog.setMessage("Loading Data");
-        //showDialog();
-
         String tag_string_req = "req_getMarkerDetails";
 
         StringRequest strReq = new StringRequest(Request.Method.POST,
@@ -398,7 +394,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             @Override
             public void onResponse(String response) {
-                //hideDialog();
                 try {
                     JSONObject jObj = new JSONObject(response);
                     boolean error = jObj.getBoolean("error");

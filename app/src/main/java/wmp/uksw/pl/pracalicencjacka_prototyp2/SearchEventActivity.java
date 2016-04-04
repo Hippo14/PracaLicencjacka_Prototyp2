@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.AsyncTask;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -51,22 +52,13 @@ public class SearchEventActivity extends MyActivityTemplate {
         View.OnClickListener onClickListener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                // Getting EditText
-//                EditText etLocation = (EditText) findViewById(R.id.etSearch);
-//                // Getting string
-//                String location = etLocation.getText().toString();
-//
-//                if (location != null && !location.equals(""))
-//                    new GeoCoderTask().execute(location);
+                // Getting EditText
+                EditText etLocation = (EditText) findViewById(R.id.etSearch);
+                // Getting string
+                String location = etLocation.getText().toString();
 
-                // Save searched location as (x, y)
-                LatLng location = new LatLng(Double.parseDouble("52.2296756"), Double.parseDouble("21.0122287"));
-                sessionManager.setLatLng(location);
-
-                // Intent to GoogleMaps Activity
-                Intent intent = new Intent(getContext(), MapsActivity.class);
-                startActivity(intent);
-                finish();
+                if (location != null && !location.equals(""))
+                    new GeoCoderTask().execute(location);
             }
         };
 
@@ -132,37 +124,6 @@ public class SearchEventActivity extends MyActivityTemplate {
             Geocoder geocoder = new Geocoder(getBaseContext());
             List<Address> addresses = new ArrayList<>();
 
-//            String tag_string_req = "req_getLocation";
-//
-//
-//            String UrlCity = "http://maps.googleapis.com/maps/api/geocode/json?address=" + params[0] + "&sensor=false";
-//
-//            JsonObjectRequest stateReq = new JsonObjectRequest(Request.Method.GET, UrlCity, null, new Response.Listener<JSONObject>() {
-//                @Override
-//                public void onResponse(JSONObject response) {
-//
-//                    try {
-//                        // Get JSON Array called "results" and then get the 0th
-//                        // complete object as JSON
-//                        location = response.getJSONArray("results").getJSONObject(0).getJSONObject("geometry").getJSONObject("location");
-//                        // Get the value of the attribute whose name is
-//                        // "formatted_string"
-//                        stateLocation = new LatLng(location.getDouble("lat"), location.getDouble("lng"));
-//                    } catch (JSONException e1) {
-//                        e1.printStackTrace();
-//
-//                    }
-//                }
-//
-//            }, new Response.ErrorListener() {
-//                @Override
-//                public void onErrorResponse(VolleyError error) {
-//                    Log.d("Error.Response", error.toString());
-//                }
-//            });
-//            // add it to the RequestQueue
-//            // Adding request to request queue
-//            AppController.getInstance().addToRequestQueue(stateReq, tag_string_req);
 
             try {
                 addresses = geocoder.getFromLocationName(params[0], 1);
@@ -176,7 +137,9 @@ public class SearchEventActivity extends MyActivityTemplate {
         @Override
         protected void onPostExecute(List<Address> addresses) {
             if (addresses == null || addresses.size() == 0) {
-                Toast.makeText(getBaseContext(), "No location found", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getBaseContext(), "No location found", Toast.LENGTH_SHORT).show();
+                Snackbar.make(findViewById(R.id.searchEventLayout),
+                        "No location found", Snackbar.LENGTH_LONG).show();
             }
 
             list = addresses;
