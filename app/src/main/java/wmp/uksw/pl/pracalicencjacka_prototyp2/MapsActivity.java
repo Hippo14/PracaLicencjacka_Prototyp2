@@ -1,12 +1,16 @@
 package wmp.uksw.pl.pracalicencjacka_prototyp2;
 
+import android.app.Application;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Looper;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
 import android.util.Log;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.android.volley.Request;
@@ -51,9 +55,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private boolean isRunning = false;
 
     private List<Marker> markerList;
-    private String markerDetailsTitle;
-    private String markerDetailsUsername;
-    private String markerDetailsDescription;
+
+    private ProgressDialog progressDialog;
+
+    private LinearLayout afterLoad;
+
+    String markerDetailsTitle = null;
+    String markerDetailsUsername = null;
+    String markerDetailsDescription = null;
+
+    Marker marker;
+    private boolean clicked = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +79,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         sessionManager = new SessionManager(getApplicationContext());
         markerList = new ArrayList<>();
+        // Progress dialog
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setCancelable(false);
 
         //scheduleAlarm();
     }
@@ -158,7 +173,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
-                getMarkerDetails(marker.getTitle(), marker.getPosition().latitude, marker.getPosition().longitude);
+                //getMarkerDetails(marker.getTitle(), marker.getPosition().latitude, marker.getPosition().longitude);
 
                 return false;
             }
@@ -168,17 +183,30 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
             @Override
             // Use default InfoWindow frame
-            public View getInfoWindow(Marker marker) {
-                return null;
-            }
+            public View getInfoWindow(final Marker marker) {
+                MapsActivity.this.marker = marker;
 
-            // Defines the contents of the InfoWindow
-            @Override
-            public View getInfoContents(Marker marker) {
                 //Getting view from the layout file
-                View v = getLayoutInflater().inflate(R.layout.marker_layout, null);
-                // Getting the position from the marker
-                LatLng latLng = marker.getPosition();
+                final View v = getLayoutInflater().inflate(R.layout.marker_layout, null);
+
+                afterLoad = (LinearLayout) v.findViewById(R.id.afterLoad);
+
+                getMarkerDetails(marker.getTitle(), marker.getPosition().latitude, marker.getPosition().longitude, new VolleyCallback() {
+                    @Override
+                    public void onSuccess(JSONObject result) {
+                        try {
+                            markerDetailsTitle = result.getString("title");
+                            markerDetailsUsername = result.getString("username");
+                            markerDetailsDescription = result.getString("description");
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                        getInfoContents(marker);
+                    }
+                });
+
+                //afterLoad.setVisibility(View.VISIBLE);
 
                 // Getting the reference to the TextView to set latitude
                 TextView markerTitle = (TextView) v.findViewById(R.id.markerTitle);
@@ -190,6 +218,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 markerDescription.setText(markerDetailsDescription);
 
                 return v;
+            }
+
+            // Defines the contents of the InfoWindow
+            @Override
+            public View getInfoContents(Marker marker) {
+                if (MapsActivity.this.marker != null && MapsActivity.this.marker.isInfoWindowShown()) {
+                    MapsActivity.this.marker.showInfoWindow();
+                }
+
+                return null;
             }
         });
 
@@ -348,7 +386,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         AppController.getInstance().addToRequestQueue(strReq, tag_string_req);
     }
 
-    private void getMarkerDetails(final String name, final Double latitude, final Double longitude) {
+    private void getMarkerDetails(final String name, final Double latitude, final Double longitude, final VolleyCallback callback) {
+        progressDialog.setTitle("Please wait");
+        progressDialog.setMessage("Loading Data");
+        //showDialog();
+
         String tag_string_req = "req_getMarkerDetails";
 
         StringRequest strReq = new StringRequest(Request.Method.POST,
@@ -356,6 +398,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             @Override
             public void onResponse(String response) {
+                //hideDialog();
                 try {
                     JSONObject jObj = new JSONObject(response);
                     boolean error = jObj.getBoolean("error");
@@ -364,11 +407,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     if (!error) {
                         JSONObject markerDetails = jObj.getJSONObject("marker");
 
-                        // Set marker details
-                        markerDetailsTitle = markerDetails.getString("title");
-                        markerDetailsUsername = markerDetails.getString("username");
-                        markerDetailsDescription = markerDetails.getString("description");
-
+//                        // Set marker details
+//                        markerDetailsTitle = markerDetails.getString("title");
+//                        markerDetailsUsername = markerDetails.getString("username");
+//                        markerDetailsDescription = markerDetails.getString("description");
+                        callback.onSuccess(markerDetails);
                     } else {
                         // Error in login. Get the error message
                         String errorMsg = jObj.getString("error_msg");
@@ -406,10 +449,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         };
 
-        Log.d("EventService", "End getting events");
-
         // Adding request to request queue
         AppController.getInstance().addToRequestQueue(strReq, tag_string_req);
     }
 
+    private void showDialog() {
+        if (!progressDialog.isShowing())
+            progressDialog.show();
+    }
+
+    private void hideDialog() {
+        if (progressDialog.isShowing())
+            progressDialog.dismiss();
+    }
+
+    public interface VolleyCallback {
+        void onSuccess(JSONObject result);
+    }
 }
