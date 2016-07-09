@@ -54,7 +54,7 @@
             <!--android:layout_marginTop="60dp"-->
         <!--/>-->
     </FrameLayout>
-    <EditText
+    <wmp.uksw.pl.pracalicencjacka_prototyp2.components.editText.InputText
         android:id="@+id/email"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -70,7 +70,7 @@
         android:drawableLeft="@drawable/ic_language"
         android:drawablePadding="16dp"
     />
-    <EditText
+    <wmp.uksw.pl.pracalicencjacka_prototyp2.components.editText.InputText
         android:id="@+id/password"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -86,7 +86,7 @@
         android:drawablePadding="16dp"
         android:drawableLeft="@drawable/ic_lock_outline"
     />
-    <Button
+    <wmp.uksw.pl.pracalicencjacka_prototyp2.components.buttons.BtnLogin
         android:id="@+id/buttonsignin"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

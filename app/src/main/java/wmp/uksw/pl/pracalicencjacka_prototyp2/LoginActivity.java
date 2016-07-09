@@ -23,15 +23,21 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.Map;
 
+import wmp.uksw.pl.pracalicencjacka_prototyp2.components.buttons.BtnLogin;
+import wmp.uksw.pl.pracalicencjacka_prototyp2.components.editText.InputText;
 import wmp.uksw.pl.pracalicencjacka_prototyp2.conf.URL;
 import wmp.uksw.pl.pracalicencjacka_prototyp2.helpers.VolleyErrorHelper;
 import wmp.uksw.pl.pracalicencjacka_prototyp2.template.MyActivityTemplate;
 import wmp.uksw.pl.pracalicencjacka_prototyp2.user.ProfileUser;
 
-public class LoginActivity extends MyActivityTemplate {
+public class LoginActivity extends MyActivityTemplate implements View.OnClickListener {
 
-    private Button btnLogin;
-    private TextView btnRegister;
+    BtnLogin buttonLogin;
+    TextView buttonRegister;
+
+    InputText inputEmail;
+    InputText inputPassword;
+
     ProgressDialog progressDialog;
 
     @Override
@@ -39,33 +45,35 @@ public class LoginActivity extends MyActivityTemplate {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        btnRegister = (TextView) findViewById(R.id.signin);
+        inputEmail = (InputText) findViewById(R.id.email);
+        inputPassword = (InputText) findViewById(R.id.password);
+
+        buttonLogin = (BtnLogin) findViewById(R.id.buttonsignin);
+        buttonRegister = (TextView) findViewById(R.id.signin);
 
         // Progress dialog
         progressDialog = new ProgressDialog(this);
         progressDialog.setCancelable(false);
 
-        // Button Register event click
-        btnRegister.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-//                onClickLogin();
-                Intent it = new Intent(LoginActivity.this, RegisterActivity.class);
-                startActivity(it);
-            }
-        });
+        buttonLogin.setOnClickListener(this);
+        buttonRegister.setOnClickListener(this);
+
+        // Check if user is already logged in or not
+        if (sessionManager.getLogin()) {
+            // User is already logged in. Take him to main activity
+            Intent intent = new Intent(LoginActivity.this, MenuActivity.class);
+            startActivity(intent);
+            finish();
+        }
     }
 
-
-
-    private void showDialog() {
-        if (!progressDialog.isShowing())
-            progressDialog.show();
+    private void onClickLogin() {
+        buttonLogin.onClick(inputEmail.getInputText(), inputPassword.getInputText());
     }
 
-    private void hideDialog() {
-        if (progressDialog.isShowing())
-            progressDialog.dismiss();
+    private void onClickRegister() {
+        Intent it = new Intent(LoginActivity.this, RegisterActivity.class);
+        startActivity(it);
     }
 
     @Override
@@ -78,4 +86,13 @@ public class LoginActivity extends MyActivityTemplate {
         return getApplicationContext();
     }
 
+    @Override
+    public void onClick(View v) {
+        if (v == buttonLogin) {
+            onClickLogin();
+        }
+        else if (v == buttonRegister) {
+            onClickRegister();
+        }
+    }
 }

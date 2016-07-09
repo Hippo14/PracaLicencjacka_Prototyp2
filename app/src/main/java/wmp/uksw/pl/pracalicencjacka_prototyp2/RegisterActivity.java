@@ -3,16 +3,12 @@ package wmp.uksw.pl.pracalicencjacka_prototyp2;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
 import android.widget.TextView;
 
-import com.google.android.gms.appindexing.Action;
-import com.google.android.gms.appindexing.AppIndex;
-import com.google.android.gms.common.api.GoogleApiClient;
 
 
 import wmp.uksw.pl.pracalicencjacka_prototyp2.components.buttons.BtnRegister;
@@ -22,13 +18,13 @@ import wmp.uksw.pl.pracalicencjacka_prototyp2.template.MyActivityTemplate;
 
 public class RegisterActivity extends MyActivityTemplate implements View.OnClickListener {
 
-    private InputText inputName;
-    private InputText inputEmail;
-    private InputText inputPassword;
-    private ProgressDialog progressDialog;
+    InputText inputName;
+    InputText inputEmail;
+    InputText inputPassword;
+    ProgressDialog progressDialog;
 
-    private TextView btnLogin;
-    private BtnRegister buttonRegister;
+    TextView btnLogin;
+    BtnRegister buttonRegister;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,14 +44,6 @@ public class RegisterActivity extends MyActivityTemplate implements View.OnClick
         progressDialog = new ProgressDialog(this);
         progressDialog.setCancelable(false);
 
-        // Check if user is already logged in or not
-        if (sessionManager.getLogin()) {
-            // User is already logged in. Take him to main activity
-            Intent intent = new Intent(RegisterActivity.this, MenuActivity.class);
-            startActivity(intent);
-            finish();
-        }
-
         // Validation formula
 //        registerViews();
     }
@@ -63,6 +51,10 @@ public class RegisterActivity extends MyActivityTemplate implements View.OnClick
     private void onClickLogin() {
         Intent it = new Intent(RegisterActivity.this, LoginActivity.class);
         startActivity(it);
+    }
+
+    private void onClickRegister() {
+        buttonRegister.onClick(inputEmail.getInputText(), inputName.getInputText(), inputPassword.getInputText());
     }
 
     private void registerViews() {
@@ -116,36 +108,13 @@ public class RegisterActivity extends MyActivityTemplate implements View.OnClick
         return getApplicationContext();
     }
 
-    private void showDialog() {
-        if (!progressDialog.isShowing())
-            progressDialog.show();
-    }
-
-    private void hideDialog() {
-        if (progressDialog.isShowing())
-            progressDialog.dismiss();
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-    }
-
     @Override
     public void onClick(View v) {
         if (v == btnLogin) {
             onClickLogin();
         }
         else if (v == buttonRegister) {
-            progressDialog.setMessage("Creating account...");
-            showDialog();
-            buttonRegister.onClick(inputEmail.getText().toString(), inputName.getText().toString(), inputPassword.getText().toString());
-            hideDialog();
+            onClickRegister();
         }
     }
 

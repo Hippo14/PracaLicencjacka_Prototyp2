@@ -34,4 +34,7 @@ public class InputText extends EditText {
         this.text = getText().toString();
     }
 
+    public String getInputText() {
+        return text;
+    }
 }

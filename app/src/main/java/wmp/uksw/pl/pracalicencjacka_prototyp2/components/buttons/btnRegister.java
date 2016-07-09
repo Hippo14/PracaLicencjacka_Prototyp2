@@ -1,5 +1,6 @@
 package wmp.uksw.pl.pracalicencjacka_prototyp2.components.buttons;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.support.design.widget.Snackbar;
@@ -31,6 +32,7 @@ import wmp.uksw.pl.pracalicencjacka_prototyp2.user.ProfileUser;
  */
 public class BtnRegister extends Button implements iButton {
 
+    ProgressDialog progressDialog;
     SessionManager sessionManager;
     Context context;
 
@@ -51,6 +53,9 @@ public class BtnRegister extends Button implements iButton {
     private void init(Context context) {
         sessionManager = new SessionManager(context);
         this.context = context;
+
+        progressDialog = new ProgressDialog(context);
+        progressDialog.setCancelable(false);
     }
 
 
@@ -65,14 +70,29 @@ public class BtnRegister extends Button implements iButton {
 
     }
 
+    private void showDialog() {
+        if (!progressDialog.isShowing())
+            progressDialog.show();
+    }
+
+    private void hideDialog() {
+        if (progressDialog.isShowing())
+            progressDialog.dismiss();
+    }
+
     private void registerUser(final String name, final String email, final String accountType, final String password) {
         String tag_string_req = "req_register";
+
+        progressDialog.setMessage("Creating account");
+        showDialog();
 
         StringRequest strReq = new StringRequest(Request.Method.POST,
                 URL.URL_REGISTER, new Response.Listener<String>() {
 
             @Override
             public void onResponse(String response) {
+                hideDialog();
+
                 try {
                     JSONObject jObj = new JSONObject(response);
                     boolean error = jObj.getBoolean("error");
@@ -93,11 +113,11 @@ public class BtnRegister extends Button implements iButton {
                         // Launch main activity
                         Intent intent = new Intent(context,
                                 MenuActivity.class);
-                        getContext().startActivity(intent);
+                        context.startActivity(intent);
                     } else {
                         // Error in login. Get the error message
                         String errorMsg = jObj.getString("error_msg");
-                        Snackbar.make(findViewById(R.id.layoutRegister),
+                        Snackbar.make(getRootView(),
                                 errorMsg, Snackbar.LENGTH_LONG).show();
                     }
                 } catch (JSONException e) {
@@ -111,6 +131,7 @@ public class BtnRegister extends Button implements iButton {
 
             @Override
             public void onErrorResponse(VolleyError error) {
+                hideDialog();
                 Snackbar.make(getRootView(),
                         VolleyErrorHelper.getMessage(error, context), Snackbar.LENGTH_LONG).show();
             }
