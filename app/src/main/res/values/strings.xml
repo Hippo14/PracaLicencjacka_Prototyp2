@@ -28,6 +28,7 @@
     <string name="nointernet">No internet error</string>
     <string name="generic_error">Generic error</string>
     <string name="title_activity_event_add">Map</string>
+    <string name="title_activity_login">LoginActivity</string>
 
 
 </resources>

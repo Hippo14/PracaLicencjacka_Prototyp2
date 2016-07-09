@@ -5,11 +5,12 @@ package wmp.uksw.pl.pracalicencjacka_prototyp2.conf;
  */
 public class URL {
 
-    public static String URL_GET_ADDEDEVENTS = "http://164.132.55.196/getaddedevents";
-    public static String URL_GET_MARKERDETAILS = "http://164.132.55.196/getmarkerdetails";
-    public static String URL_GET_EVENTS = "http://164.132.55.196/getevent";
-    public static String URL_ADD_EVENT = "http://164.132.55.196/addevent";
-    public static String URL_REGISTER = "http://164.132.55.196/register";
-    public static String URL_LOGIN = "http://164.132.55.196/login";
+    public static String URL_DOMAIN = "http://lubiekokosy.pl/pracalicencjacka/";
 
+    public static String URL_GET_ADDEDEVENTS = URL_DOMAIN + "getaddedevents";
+    public static String URL_GET_MARKERDETAILS = URL_DOMAIN + "getmarkerdetails";
+    public static String URL_GET_EVENTS = URL_DOMAIN + "getevent";
+    public static String URL_ADD_EVENT = URL_DOMAIN + "addevent";
+    public static String URL_REGISTER = URL_DOMAIN + "register";
+    public static String URL_LOGIN = URL_DOMAIN + "login";
 }

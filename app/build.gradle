@@ -11,6 +11,8 @@ android {
         targetSdkVersion 22
         versionCode 1
         versionName "1.0"
+        // Enabling multidex support.
+        multiDexEnabled true
     }
     buildTypes {
         release {
@@ -39,4 +41,6 @@ dependencies {
 
     //Optional for built-in cards
     compile 'com.github.gabrielemariotti.cards:cardslib-cards:2.1.0'
+    //MultiDex
+    compile 'com.android.support:multidex:1.0.1'
 }

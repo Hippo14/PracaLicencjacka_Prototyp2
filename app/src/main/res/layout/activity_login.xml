@@ -20,17 +20,17 @@
             android:orientation="horizontal"
             android:layout_gravity="center|bottom"
             android:background="#80000000"
-            >
+        >
             <TextView
                 android:id="@+id/signin"
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
+                android:text="Sign in"
+                android:textColor="#087272"
+                android:textSize="16dp"
                 android:layout_gravity="center"
                 android:gravity="center"
-                android:text="Sign in"
-                android:textColor="#fff"
-                android:textSize="16dp"
                 android:padding="16dp"
             />
             <TextView
@@ -38,11 +38,11 @@
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
-                android:text="Sign Up"
-                android:textColor="#087272"
-                android:textSize="16dp"
                 android:layout_gravity="center"
                 android:gravity="center"
+                android:text="Sign up"
+                android:textColor="#fff"
+                android:textSize="16dp"
                 android:padding="16dp"
             />
         </LinearLayout>
@@ -54,7 +54,7 @@
             <!--android:layout_marginTop="60dp"-->
         <!--/>-->
     </FrameLayout>
-    <wmp.uksw.pl.pracalicencjacka_prototyp2.components.editText.InputText
+    <EditText
         android:id="@+id/email"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -70,23 +70,7 @@
         android:drawableLeft="@drawable/ic_language"
         android:drawablePadding="16dp"
     />
-    <wmp.uksw.pl.pracalicencjacka_prototyp2.components.editText.InputText
-        android:id="@+id/user"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Username"
-        android:inputType="text"
-        android:textColor="#000"
-        android:background="#f0f0f4"
-        android:padding="12dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="10dp"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
-        android:drawableLeft="@drawable/ic_account"
-        android:drawablePadding="16dp"
-    />
-    <wmp.uksw.pl.pracalicencjacka_prototyp2.components.editText.InputText
+    <EditText
         android:id="@+id/password"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -102,8 +86,8 @@
         android:drawablePadding="16dp"
         android:drawableLeft="@drawable/ic_lock_outline"
     />
-    <wmp.uksw.pl.pracalicencjacka_prototyp2.components.buttons.BtnRegister
-        android:id="@+id/createaccount"
+    <Button
+        android:id="@+id/buttonsignin"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/rounded"
@@ -112,8 +96,16 @@
         android:layout_marginRight="70dp"
         android:textAlignment="center"
         android:padding="14dp"
-        android:text="Create account"
+        android:text="Sign In"
         android:textSize="16dp"
         android:textColor="#fff"
     />
+    <TextView
+        android:id="@+id/account"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Don't have an account?"
+        android:textSize="16dp"
+        android:layout_gravity="center"
+        android:layout_marginTop="5dp" />
 </LinearLayout>
